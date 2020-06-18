@@ -2,7 +2,7 @@
 const express = require("express");
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize('mysql://root@localhost:3306/delilah');
-module.exports = {sequelize};
+module.exports = {sequelize, Sequelize};
 
 const app = express();
 
@@ -10,6 +10,7 @@ const app = express();
 app.use("/", require("./src/routes/users/user_check"));
 app.use("/", require("./src/routes/users/user_signup"));
 app.use("/", require("./src/routes/items/item_registry"));
+app.use("/", require("./src/routes/items/item-check"));
 app.use("/", require("./src/routes/restaurants/restaurant_signup"));
 app.use("/", require("./src/routes/restaurants/restaurant_check"));
 
