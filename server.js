@@ -13,6 +13,8 @@ app.use("/", require("./src/routes/items/item_registry"));
 app.use("/", require("./src/routes/items/item-check"));
 app.use("/", require("./src/routes/restaurants/restaurant_signup"));
 app.use("/", require("./src/routes/restaurants/restaurant_check"));
+app.use("/", require("./src/routes/orders/create-order"));
+app.use("/", require("./src/routes/orders/cancel-order"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>{
