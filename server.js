@@ -15,6 +15,7 @@ app.use("/", require("./src/routes/restaurants/restaurant_signup"));
 app.use("/", require("./src/routes/restaurants/restaurant_check"));
 app.use("/", require("./src/routes/orders/create-order"));
 app.use("/", require("./src/routes/orders/cancel-order"));
+app.use("/", require("./src/routes/orders/view-orders"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>{
