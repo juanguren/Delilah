@@ -46,6 +46,7 @@ CREATE TABLE orders(
     order_id int primary key AUTO_INCREMENT,
     order_time smalldatetime not null,
     arrival_time smalldatetime not null,
+    order_state varchar(10) not null,
     canceled_order_id int,
     user_id int,
     FOREIGN KEY user_id REFERENCES users(user_id),
