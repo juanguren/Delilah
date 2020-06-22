@@ -17,20 +17,17 @@ function assignToRestaurant(req, res, next){ // Make this an independant endpoin
     });
 }
 
-router.post("/create_item", assignToRestaurant, (req, res) =>{ // TODO - ¿How to add restaurant id? (FK) --> La FK es literalmente el nombre de la FK de restaurantes
-    let FK = req.params.restaurant_FK;
-    console.log(FK);
+router.post("/create_item", assignToRestaurant, (req, res) =>{
     
     const {name, photo_url, price, description, cooking_time} = req.body;
     
-    sequelize.query('INSERT INTO items VALUES (NULL, :name, :photo_url, :price, :description, :cooking_time, :restaurants_id)', {
+    sequelize.query('INSERT INTO items VALUES (NULL, :name, :photo_url, :price, :description, :cooking_time)', {
         replacements: {
             name: name,
             photo_url: photo_url,
             price: price,
             description: description,
-            cooking_time: cooking_time,
-            restaurants_id: FK
+            cooking_time: cooking_time
         }
     }).then(response => console.log(response)) 
 });
