@@ -20,7 +20,12 @@ CREATE TABLE super_admin (
 
 /* admin - table query*/
 CREATE TABLE admin(
-
+    admin_id int primary key AUTO_INCREMENT,
+    fullName varchar(20) not null,
+    admin_address varchar(20) not null,
+    phone varchar(15) not null,
+    super_id int,
+    FOREIGN KEY super_id REFERENCES super_admin(super_id)
 )
 
 /* items - table query*/
@@ -29,7 +34,7 @@ CREATE TABLE items (
     name varchar(40) NOT NULL,
     photo_url varchar(250) NOT NULL,
     price int NOT NULL,
-    description varchar(80) NOT NULL,
+    item_description varchar(80) NOT NULL,
     cooking_time time NOT NULL,
     quantity int NOT NULL
 )
@@ -46,7 +51,7 @@ CREATE TABLE orders(
     order_id int primary key AUTO_INCREMENT,
     order_time smalldatetime not null,
     arrival_time smalldatetime not null,
-    order_state varchar(10) not null,
+    order_status varchar(10) not null,
     canceled_order_id int,
     user_id int,
     FOREIGN KEY user_id REFERENCES users(user_id),
