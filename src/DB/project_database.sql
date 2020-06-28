@@ -15,7 +15,7 @@ CREATE TABLE users(
 CREATE TABLE super_admin (
 	super_id int PRIMARY KEY,
     fullName varchar(20) not null,
-    super_address varchar(25) not null,
+    super_address varchar(25) not null
 )
 
 /* admin - table query*/
@@ -25,7 +25,7 @@ CREATE TABLE admin(
     admin_address varchar(20) not null,
     phone varchar(15) not null,
     super_id int,
-    FOREIGN KEY super_id REFERENCES super_admin(super_id)
+    FOREIGN KEY (super_id) REFERENCES super_admin(super_id)
 )
 
 /* items - table query*/
@@ -42,20 +42,20 @@ CREATE TABLE items (
 /* canceled_order - table query*/
 CREATE TABLE canceled_order(
     canceled_order_id int primary key AUTO_INCREMENT,
-    canceling_reason varchar(max),
-    canceling_time smalldatetime
+    canceling_reason varchar(240),
+    canceling_time datetime
 )
 
 /* orders - table query*/
 CREATE TABLE orders(
     order_id int primary key AUTO_INCREMENT,
-    order_time smalldatetime not null,
-    arrival_time smalldatetime not null,
+    order_time datetime not null,
+    arrival_time datetime not null,
     order_status varchar(10) not null,
     canceled_order_id int,
     user_id int,
-    FOREIGN KEY user_id REFERENCES users(user_id),
-    FOREIGN KEY canceled_order_id REFERENCES canceled_order(canceled_order_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (canceled_order_id) REFERENCES canceled_order(canceled_order_id)
 )
 
 /* order_items - table query*/
@@ -63,8 +63,8 @@ CREATE TABLE order_items(
     order_item_id int primary key AUTO_INCREMENT,
     order_id int,
     item_id int,
-    FOREIGN KEY user_id REFERENCES users(user_id),
-    FOREIGN KEY item_id REFERENCES items(item_id)
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (item_id) REFERENCES items(item_id)
 )
 
 "The SQL EXISTS Operator
