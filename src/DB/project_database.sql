@@ -36,7 +36,8 @@ CREATE TABLE items (
     price int NOT NULL,
     item_description varchar(80) NOT NULL,
     cooking_time time NOT NULL,
-    quantity int NOT NULL
+    quantity int NOT NULL,
+    item_code int not null
 )
 
 /* canceled_order - table query*/
