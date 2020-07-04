@@ -6,8 +6,6 @@ const { sequelize, Sequelize } = require("../../../server");
 
 router.use(body_parser.json());
 
-let adminOn = false;
-
 router.post("/init_operations", (req, res) =>{
     const { super_id, fullName, address } = req.body;
 
@@ -27,8 +25,9 @@ router.post("/init_operations", (req, res) =>{
     }
 });
 
-validateSuper = (req, res, next) =>{
+let validateSuper = (req, res, next) =>{
     let ID = req.params.id;
+    let adminOn = false;
 
     sequelize.query('SELECT * from super_admin WHERE super_id = :id',{
         type: Sequelize.QueryTypes.SELECT,
@@ -39,14 +38,14 @@ validateSuper = (req, res, next) =>{
         if (response == "") {
             res.status(404).json({err: "Super admin not found. Please check its credentials"});
         } else{
+            adminOn = true;
             next();
         }
     })
 }
 
 router.post("/super_login/:id", validateSuper, (req, res) =>{
-    adminOn = true;
     res.status(200).json({msg: "Login succesful!"})
 })
 
-module.exports = {router, adminOn};
+module.exports = router;
