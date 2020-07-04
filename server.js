@@ -11,8 +11,6 @@ app.use("/", require("./src/routes/users/user_check"));
 app.use("/", require("./src/routes/users/user_signup"));
 app.use("/", require("./src/routes/items/item_registry"));
 app.use("/", require("./src/routes/items/item-check"));
-app.use("/", require("./src/routes/restaurants/restaurant_signup"));
-app.use("/", require("./src/routes/restaurants/restaurant_check"));
 app.use("/", require("./src/routes/orders/create-order"));
 app.use("/", require("./src/routes/orders/cancel-order"));
 app.use("/", require("./src/routes/orders/view-orders"));
