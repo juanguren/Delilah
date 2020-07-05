@@ -1,10 +1,19 @@
 
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const body_parser = require("body-parser");
 const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
 
 router.use(body_parser.json());
+
+const user = "juanguren";
+const pass = "123";
+
+const token = jwt.sign(user, pass);
+console.log(token);
+
+// ! Add the following fields to super DB: username, password, isLogged. 
 
 router.post("/init_operations", (req, res) =>{
     const { super_id, fullName, address } = req.body;
