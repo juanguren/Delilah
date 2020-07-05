@@ -13,7 +13,7 @@ CREATE TABLE users(
 
 /* super_admin - table query */
 CREATE TABLE super_admin (
-	super_id int PRIMARY KEY,
+	super_id int PRIMARY KEY AUTO_INCREMENT,
     fullName varchar(20) not null,
     super_address varchar(25) not null,
     username VARCHAR(15) not null,

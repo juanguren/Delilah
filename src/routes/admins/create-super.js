@@ -15,25 +15,38 @@ console.log(token);
 
 // ! Add the following fields to super DB: username, password, isLogged. 
 
-router.post("/init_operations", (req, res) =>{
-    const { super_id, fullName, address } = req.body;
-
+router.post("/start", (req, res) =>{
+    const { fullName, super_address, username, password, isLogged } = req.body;
+    console.log(fullName, super_address, username, password, isLogged);
     if (req.body) {
-        sequelize.query('INSERT into super_admin VALUES (:super_id, :fullName, :address)',{
+        sequelize.query('INSERT into super_admin VALUES (NULL, :fullName, :super_address, :username, :password, :isLogged)',{
             replacements: {
-                super_id: super_id,
-                fullName: fullName,
-                address: address
+                fullName,
+                super_address,
+                username,
+                password,
+                isLogged
             }
         }).then((response) =>{
-            console.log(response);
-            res.status(201).json({msg: `Super admin ${fullName} created succesfully`});
-        }).catch(err => res.json({err: err}))
+            if (response = "") {
+                res.status(400).json({err: "There was an error creating this super admin. Please try again."})
+            } else{
+                sequelize.query('UPDATE super_admin SET isLogged = "true" WHERE password = :password ',{
+                    replacements: {
+                        password
+                    }
+                }).then(response => console.log(response))
+                    .catch(err => console.log(err));
+                    
+                res.status(201).json({msg: `Super admin ${fullName} created and logged in succesfully`});
+            }
+        }).catch(err => console.log(err))
     } else{
         res.status(404).json({msg: "Incomplete data!"})
     }
 });
 
+/*
 let validateSuper = (req, res, next) =>{
     let ID = req.params.id;
     let adminOn = false;
@@ -56,5 +69,5 @@ let validateSuper = (req, res, next) =>{
 router.post("/super_login/:id", validateSuper, (req, res) =>{
     res.status(200).json({msg: "Login succesful!"})
 })
-
+*/
 module.exports = router;
