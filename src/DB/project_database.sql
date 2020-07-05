@@ -15,7 +15,10 @@ CREATE TABLE users(
 CREATE TABLE super_admin (
 	super_id int PRIMARY KEY,
     fullName varchar(20) not null,
-    super_address varchar(25) not null
+    super_address varchar(25) not null,
+    username VARCHAR(15) not null,
+    password VARCHAR(15) not null,
+    isLogged VARCHAR(5) NOT NULL
 )
 
 /* admin - table query*/
