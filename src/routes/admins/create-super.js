@@ -9,13 +9,18 @@ router.use(body_parser.json());
 
 const user = "juanguren";
 const pass = "123";
-
 const token = jwt.sign(user, pass);
 console.log(token);
 
 // ! Add the following fields to super DB: username, password, isLogged. 
 
-router.post("/start", (req, res) =>{
+let validateSuperwithJWT = (req, res, next) =>{
+    const { username, password } = req.body;
+    const token = jwt.sign(username, password);
+    console.log(token);
+}
+
+router.post("/start", validateSuperwithJWT, (req, res) =>{
     const { fullName, super_address, username, password, isLogged } = req.body;
     console.log(fullName, super_address, username, password, isLogged);
     if (req.body) {
@@ -37,7 +42,7 @@ router.post("/start", (req, res) =>{
                     }
                 }).then(response => console.log(response))
                     .catch(err => console.log(err));
-                    
+
                 res.status(201).json({msg: `Super admin ${fullName} created and logged in succesfully`});
             }
         }).catch(err => console.log(err))
@@ -45,6 +50,10 @@ router.post("/start", (req, res) =>{
         res.status(404).json({msg: "Incomplete data!"})
     }
 });
+
+router.post("/super/logout", (req, res) =>{
+
+})
 
 /*
 let validateSuper = (req, res, next) =>{
