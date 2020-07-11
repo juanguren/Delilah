@@ -61,11 +61,15 @@ let validateWithJWT = (req, res, next) =>{
 
 router.post("/super-login", validateWithJWT, (req, res) =>{
     const username = req.body;
-
     const superToken = req.params.token;
     res.status(201).json({msg: `Admin *${username.username}* created succesfully`,
         superToken});
 });
+
+router.post("/auth", (req, res) =>{
+    const hey = req.headers.authorization.split(' ')[1];
+    console.log(hey);
+})
 
 router.post("/super/logout", (req, res) =>{
 
