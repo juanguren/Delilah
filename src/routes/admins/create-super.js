@@ -7,22 +7,10 @@ const { sequelize, Sequelize } = require("../../../server");
 
 router.use(body_parser.json());
 
-const user = "juanguren";
-const pass = "123";
-const token = jwt.sign(user, pass);
-console.log(token);
-
 // ! Add the following fields to super DB: username, password, isLogged. 
 
-let validateSuperwithJWT = (req, res, next) =>{
-    const { username, password } = req.body;
-    const token = jwt.sign(username, password);
-    console.log(token);
-}
-
-router.post("/start", validateSuperwithJWT, (req, res) =>{
+router.post("/start", (req, res) =>{
     const { fullName, super_address, username, password, isLogged } = req.body;
-    console.log(fullName, super_address, username, password, isLogged);
     if (req.body) {
         sequelize.query('INSERT into super_admin VALUES (NULL, :fullName, :super_address, :username, :password, :isLogged)',{
             replacements: {
@@ -51,32 +39,36 @@ router.post("/start", validateSuperwithJWT, (req, res) =>{
     }
 });
 
-router.post("/super/logout", (req, res) =>{
-
-})
-
-/*
-let validateSuper = (req, res, next) =>{
-    let ID = req.params.id;
-    let adminOn = false;
-
-    sequelize.query('SELECT * from super_admin WHERE super_id = :id',{
-        type: Sequelize.QueryTypes.SELECT,
-        replacements: {
-            id: ID
-        }
-    }).then((response) =>{
-        if (response == "") {
-            res.status(404).json({err: "Super admin not found. Please check its credentials"});
-        } else{
-            adminOn = true;
-            next();
-        }
-    })
+let validateWithJWT = (req, res, next) =>{
+    const { username, password } = req.body;
+    if (req.body) {
+        sequelize.query('SELECT * FROM `super_admin` WHERE username = :username AND password = :password',{
+            type: Sequelize.QueryTypes.SELECT,
+            replacements:{
+                username,
+                password
+            }
+        }).then((response) =>{
+            if (response) {
+                req.params.token = jwt.sign(username, password);
+                next();
+            } else{
+                res.json({err: "Invalid credentials"});
+            }
+        }).catch(err => console.log(err))
+    }
 }
 
-router.post("/super_login/:id", validateSuper, (req, res) =>{
-    res.status(200).json({msg: "Login succesful!"})
-})
-*/
+router.post("/super-login", validateWithJWT, (req, res) =>{
+    const username = req.body;
+
+    const superToken = req.params.token;
+    res.status(201).json({msg: `Admin *${username.username}* created succesfully`,
+        superToken});
+});
+
+router.post("/super/logout", (req, res) =>{
+
+});
+
 module.exports = router;
