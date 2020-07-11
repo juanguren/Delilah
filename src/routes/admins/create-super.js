@@ -4,12 +4,13 @@ const jwt = require("jsonwebtoken");
 const body_parser = require("body-parser");
 const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
+const signature = "mySignature";
 
 router.use(body_parser.json());
 
 // ! Add the following fields to super DB: username, password, isLogged. 
 
-router.post("/start", (req, res) =>{
+router.post("/create-super", (req, res) =>{
     const { fullName, super_address, username, password, isLogged } = req.body;
     if (req.body) {
         sequelize.query('INSERT into super_admin VALUES (NULL, :fullName, :super_address, :username, :password, :isLogged)',{
@@ -24,18 +25,9 @@ router.post("/start", (req, res) =>{
             if (response = "") {
                 res.status(400).json({err: "There was an error creating this super admin. Please try again."})
             } else{
-                sequelize.query('UPDATE super_admin SET isLogged = "true" WHERE password = :password ',{
-                    replacements: {
-                        password
-                    }
-                }).then(response => console.log(response))
-                    .catch(err => console.log(err));
-
-                res.status(201).json({msg: `Super admin ${fullName} created and logged in succesfully`});
+                res.status(201).json({msg: `Super admin ${fullName} created`});
             }
         }).catch(err => console.log(err))
-    } else{
-        res.status(404).json({msg: "Incomplete data!"})
     }
 });
 
@@ -50,7 +42,7 @@ let validateWithJWT = (req, res, next) =>{
             }
         }).then((response) =>{
             if (response) {
-                req.params.token = jwt.sign(username, password);
+                req.params.token = jwt.sign(username, signature);
                 next();
             } else{
                 res.json({err: "Invalid credentials"});
@@ -59,16 +51,43 @@ let validateWithJWT = (req, res, next) =>{
     }
 }
 
-router.post("/super-login", validateWithJWT, (req, res) =>{
+router.post("/auth", validateWithJWT, (req, res) =>{
     const username = req.body;
     const superToken = req.params.token;
-    res.status(201).json({msg: `Admin *${username.username}* created succesfully`,
+    res.status(201).json({msg: `Admin *${username.username}* succesfully authenticated`,
         superToken});
 });
 
-router.post("/auth", (req, res) =>{
-    const hey = req.headers.authorization.split(' ')[1];
-    console.log(hey);
+let authUser = (req, res, next) =>{
+    const getToken = req.headers.authorization.split(' ')[1]; // * Split divides the "Bearer" from the actual token. [1] is the position in which the token´s found.
+    const verifyToken = jwt.verify(getToken, signature);
+    if (verifyToken) {
+        req.params.loggedUser = verifyToken;
+        next();
+    } else{
+        res.status(404).json({err: "Something failed in the authentication process. Please check the Bearer Token"});
+    }
+}
+
+router.post("/super-login", authUser, (req, res) =>{
+    let okUsername = req.params.loggedUser;
+    sequelize.query('SELECT username FROM super_admin WHERE username = :username',{
+        type: Sequelize.QueryTypes.SELECT,
+        replacements: {
+            username: okUsername
+        }
+    }).then((response) =>{
+        if (response) {
+            sequelize.query('UPDATE super_admin SET isLogged = "true" WHERE username = :username',{
+                replacements: {
+                    username: okUsername
+                }
+            }).then((response));
+            res.status(200).json({msg: `Admin *${okUsername}* succesfully logged in`});
+        } else{
+            res.status(404).json({err: "Not found"});
+        }
+    })
 })
 
 router.post("/super/logout", (req, res) =>{
