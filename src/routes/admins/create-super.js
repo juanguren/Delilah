@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const body_parser = require("body-parser");
 const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
-const validateWithJWT = require("../validate_JWT");
+const validateWithJWT = require("../validations/superValidation");
 
 const signature = "mySignature";
 
