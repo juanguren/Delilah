@@ -7,7 +7,7 @@ const validateWithJWT = require("../validations/adminValidation");
 
 router.use(body_parser.json());
 
-let isAdminLogged = (req, res, next) =>{
+let isSuperAdminLogged = (req, res, next) =>{
     sequelize.query('SELECT * FROM super_admin WHERE isLogged = "true"',{
         type: Sequelize.QueryTypes.SELECT
     }).then((response) =>{
@@ -22,7 +22,7 @@ let isAdminLogged = (req, res, next) =>{
     }).catch(err => res.status(404).json({err}));
 }
 
-router.post("/create-admin", isAdminLogged, (req, res) =>{
+router.post("/create-admin", isSuperAdminLogged, (req, res) =>{
     const { fullName, admin_address, phone, isLogged, username, password } = req.body;
     if (req.body) {
         sequelize.query('INSERT into admin VALUES (NULL, :fullName, :admin_address, :phone, NULL, :isLogged, :username, :password)',{
