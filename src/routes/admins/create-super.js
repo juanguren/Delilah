@@ -6,9 +6,7 @@ const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
 const signature = "mySignature";
 
-router.use(body_parser.json());
-
-// ! Add the following fields to super DB: username, password, isLogged. 
+router.use(body_parser.json()); 
 
 router.post("/create-super", (req, res) =>{
     const { fullName, super_address, username, password, isLogged } = req.body;
@@ -88,10 +86,39 @@ router.post("/super-login", authUser, (req, res) =>{
             res.status(404).json({err: "Not found"});
         }
     })
-})
-
-router.post("/super/logout", (req, res) =>{
-
 });
+
+router.post("/super/:username/logout", (req, res) =>{
+    const username = req.params.username;
+    sequelize.query('SELECT * from super_admin WHERE username = :username', {
+        type: Sequelize.QueryTypes.SELECT,
+        replacements : {
+            username
+        }
+    }).then((response) =>{
+        if (response) {
+            sequelize.query('UPDATE super_admin SET isLogged = "false" WHERE username = :username',{
+                replacements: {
+                    username
+                }
+            }).then(response1 => res.status(200).json({msg: `Admin ${username} succesfuly logged out`}));
+        } else{
+            res.status(404).json({err: "Logged out unsuccesful. Please try again"});
+        }
+    }).catch(err => res.status(404).json(err));
+});
+
+// Quick view (existing super)
+router.get("/super", (req, res) =>{
+    sequelize.query('SELECT * FROM super_admin',{
+        type: Sequelize.QueryTypes.SELECT
+    }).then((response) =>{
+        if (response) {
+            res.status(200).json({response});
+        } else{
+            res.status(200).json({msg: "Empty field. There´s no super admin yet"});            
+        }
+    }).catch(err => res.status(404).json({err}));
+})
 
 module.exports = router;
