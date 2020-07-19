@@ -23,9 +23,9 @@ let isAdminLogged = (req, res, next) =>{
 }
 
 router.post("/create-admin", isAdminLogged, (req, res) =>{
-    const { fullName, admin_address, phone, password, username, isLogged } = req.body;
+    const { fullName, admin_address, phone, isLogged, username, password } = req.body;
     if (req.body) {
-        sequelize.query('INSERT into admin VALUES (NULL, :fullName, :admin_address, :phone, :password, :username, :isLogged)',{
+        sequelize.query('INSERT into admin VALUES (NULL, :fullName, :admin_address, :phone, NULL, :isLogged, :username, :password)',{
             replacements: {
                 fullName,
                 admin_address,
