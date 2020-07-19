@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const body_parser = require("body-parser");
 const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
+const validateWithJWT = require("../validate_JWT");
+
 const signature = "mySignature";
 
 router.use(body_parser.json()); 
@@ -28,26 +30,6 @@ router.post("/create-super", (req, res) =>{
         }).catch(err => console.log(err))
     }
 });
-
-let validateWithJWT = (req, res, next) =>{
-    const { username, password } = req.body;
-    if (req.body) {
-        sequelize.query('SELECT * FROM `super_admin` WHERE username = :username AND password = :password',{
-            type: Sequelize.QueryTypes.SELECT,
-            replacements:{
-                username,
-                password
-            }
-        }).then((response) =>{
-            if (response) {
-                req.params.token = jwt.sign(username, signature);
-                next();
-            } else{
-                res.json({err: "Invalid credentials"});
-            }
-        }).catch(err => console.log(err))
-    }
-}
 
 router.post("/auth", validateWithJWT, (req, res) =>{
     const username = req.body;
