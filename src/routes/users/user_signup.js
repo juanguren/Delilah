@@ -7,6 +7,11 @@ const bcrypt = require("bcrypt");
 
 const sRounds = 10;
 
+// TODO: Add this method to a login endpoint
+bcrypt.compare("hey", "$2b$10$umfY74q0qVETPz3d8HxmyOerLbiD2vSk5MsES4GqjPkr1mftIV01G", (err, result) =>{
+    console.log(result);
+})
+
 router.use(body_parser.json());
 
 // "/signup" | Validate uniqueness of the username
