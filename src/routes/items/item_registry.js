@@ -57,8 +57,8 @@ router.post("/create_item", checkUniqueItem, (req, res) =>{
             } else{
                 res.status(400).json({err: "Check all the fields are complete."})
             }
-                }
-            }).catch(err => console.log(err))
+        }
+    }).catch(err => console.log(err))
 });
 
 module.exports = router;

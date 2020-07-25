@@ -14,4 +14,18 @@ router.get("/items", (req, res) =>{
     });
 });
 
+router.get("items/:itemCode", (req, res) =>{
+    const itemID = req.params.itemCode;
+    sequelize.query('SELECT * FROM items WHERE item_code = :itemCode',{
+        type: Sequelize.QueryTypes.SELECT,
+        replacements: {
+            item_code: itemID
+        }
+    }).then((items) =>{
+        res.status(200).json(items);
+    }).catch((err) =>{
+        console.log(err);
+    });
+})
+
 module.exports = router;
