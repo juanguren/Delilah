@@ -51,7 +51,7 @@ function encryptPassword(req, res, next){
 }
 
 router.post("/user_signup", [validateUsernameExists, encryptPassword], (req, res) =>{
-    const { fullName, email, phone, address, username, password } = req.body; // * hash is null..
+    const { fullName, email, phone, address, username, password } = req.body; // ! hash is null..
 
     sequelize.query('INSERT INTO users VALUES (NULL, :fullName, :email, :phone, :address, :username, :password)', {
         replacements: {
