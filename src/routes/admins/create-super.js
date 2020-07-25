@@ -1,10 +1,10 @@
 
 const express = require("express");
-const jwt = require("jsonwebtoken");
 const body_parser = require("body-parser");
 const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
 const validateWithJWT = require("../validations/superValidation");
+const authUser = require("../validations/authUser");
 
 const signature = "mySignature";
 
@@ -37,17 +37,6 @@ router.post("/auth", validateWithJWT, (req, res) =>{
     res.status(201).json({msg: `Admin *${username.username}* succesfully authenticated`,
         superToken});
 });
-
-let authUser = (req, res, next) =>{
-    const getToken = req.headers.authorization.split(' ')[1]; // * Split divides the "Bearer" from the actual token. [1] is the position in which the token´s found.
-    const verifyToken = jwt.verify(getToken, signature);
-    if (verifyToken) {
-        req.params.loggedUser = verifyToken;
-        next();
-    } else{
-        res.status(404).json({err: "Something failed in the authentication process. Please check the Bearer Token"});
-    }
-}
 
 router.post("/super-login", authUser, (req, res) =>{
     let okUsername = req.params.loggedUser;
@@ -95,10 +84,10 @@ router.get("/super", (req, res) =>{
     sequelize.query('SELECT * FROM super_admin',{
         type: Sequelize.QueryTypes.SELECT
     }).then((response) =>{
-        if (response) {
-            res.status(200).json({response});
+        if (response == "") {
+            res.status(200).json({msg: "Empty field. There´s no super admin yet"}); 
         } else{
-            res.status(200).json({msg: "Empty field. There´s no super admin yet"});            
+            res.status(200).json({response});           
         }
     }).catch(err => res.status(404).json({err}));
 })
