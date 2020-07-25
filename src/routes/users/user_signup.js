@@ -34,8 +34,6 @@ function encryptPassword(req, res, next){
     const {username, password} = req.body;
 
     bcrypt.hash(password, sRounds, (err, hash) =>{
-        sequelize.query('ALTER TABLE users ADD `hash` VARCHAR(100) NULL AFTER `is_admin',{
-        }).then((response) => console.log(response))
         if (hash) {
             sequelize.query('UPDATE users SET hash = :hash WHERE username = :username',{
                 replacements: {
@@ -53,7 +51,7 @@ function encryptPassword(req, res, next){
 }
 
 router.post("/user_signup", [validateUsernameExists, encryptPassword], (req, res) =>{
-    const { fullName, email, phone, address, username, password } = req.body;
+    const { fullName, email, phone, address, username, password } = req.body; // * hash is null..
 
     sequelize.query('INSERT INTO users VALUES (NULL, :fullName, :email, :phone, :address, :username, :password)', {
         replacements: {
