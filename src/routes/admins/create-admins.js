@@ -4,6 +4,7 @@ const body_parser = require("body-parser");
 const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
 const validateWithJWT = require("../validations/adminValidation");
+const authUser = require("../validations/authUser");
 
 router.use(body_parser.json());
 
@@ -49,6 +50,59 @@ router.post("/admin/auth", validateWithJWT, (req, res) =>{
     const adminToken = req.params.token;
     res.status(201).json({msg: `Admin *${username.username}* succesfully authenticated`,
         adminToken});
+});
+
+router.post("/admin-login", authUser, (req, res) =>{
+    let okUsername = req.params.loggedUser;
+    sequelize.query('SELECT username FROM admin WHERE username = :username',{
+        type: Sequelize.QueryTypes.SELECT,
+        replacements: {
+            username: okUsername
+        }
+    }).then((response) =>{
+        if (response) {
+            sequelize.query('UPDATE admin SET isLogged = "true" WHERE username = :username',{
+                replacements: {
+                    username: okUsername
+                }
+            }).then((response));
+            res.status(200).json({msg: `Admin *${okUsername}* succesfully logged in`});
+        } else{
+            res.status(404).json({err: "Not found"});
+        }
+    })
+});
+
+router.post("/admin/:username/logout", (req, res) =>{
+    const username = req.params.username;
+    sequelize.query('SELECT * from admin WHERE username = :username', {
+        type: Sequelize.QueryTypes.SELECT,
+        replacements : {
+            username
+        }
+    }).then((response) =>{
+        if (response) {
+            sequelize.query('UPDATE admin SET isLogged = "false" WHERE username = :username',{
+                replacements: {
+                    username
+                }
+            }).then(response1 => res.status(200).json({msg: `Admin ${username} succesfuly logged out`}));
+        } else{
+            res.status(404).json({err: "Logged out unsuccesful. Please try again"});
+        }
+    }).catch(err => res.status(404).json(err));
+});
+
+router.get("/admin", (req, res) =>{
+    sequelize.query('SELECT * FROM admin',{
+        type: Sequelize.QueryTypes.SELECT
+    }).then((response) =>{
+        if (response == "") {
+            res.status(200).json({msg: "Empty field. There´s no super admin yet"}); 
+        } else{
+            res.status(200).json(response);
+        }
+    }).catch(err => console.log(err));
 });
 
 module.exports = router;
