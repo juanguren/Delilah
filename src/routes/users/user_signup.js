@@ -3,10 +3,11 @@ const express = require("express");
 const body_parser = require("body-parser");
 const router = express.Router();
 const {sequelize} = require("../../../server");
+const bcrypt = require("bcrypt");
+
+const sRounds = 10;
 
 router.use(body_parser.json());
-
-/* ====== SECTION - MIDDLEWARES: ======= */
 
 // "/signup" | Validate uniqueness of the username
 function validateUsernameExists(req, res, next){
@@ -24,7 +25,29 @@ function validateUsernameExists(req, res, next){
     }).catch(err => console.log(err))
 }
 
-router.post("/user_signup", validateUsernameExists, (req, res) =>{
+function encryptPassword(req, res, next){
+    const {username, password} = req.body;
+
+    bcrypt.hash(password, sRounds, (err, hash) =>{
+        sequelize.query('ALTER TABLE users ADD `hash` VARCHAR(100) NULL AFTER `is_admin',{
+        }).then((response) => console.log(response))
+        if (hash) {
+            sequelize.query('UPDATE users SET hash = :hash WHERE username = :username',{
+                replacements: {
+                    hash,
+                    username
+                }
+            }).then(response => console.log(response)
+            ).catch(error => console.log(error));
+
+            next();
+        } else{
+            res.status(400).json({err});
+        }
+    });
+}
+
+router.post("/user_signup", [validateUsernameExists, encryptPassword], (req, res) =>{
     const { fullName, email, phone, address, username, password } = req.body;
 
     sequelize.query('INSERT INTO users VALUES (NULL, :fullName, :email, :phone, :address, :username, :password)', {
@@ -34,7 +57,7 @@ router.post("/user_signup", validateUsernameExists, (req, res) =>{
             phone: phone,
             address: address,
             username: username,
-            password: password // TODO - Hash using bcrypt library for node.js
+            password: password
         }
     }).then((response) =>{
         res.json(response);

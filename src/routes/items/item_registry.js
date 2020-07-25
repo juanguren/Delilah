@@ -23,7 +23,7 @@ function checkUniqueItem (req, res, next){
     });
 }
 
-router.post("/create_item", checkUniqueItem, (req, res) =>{
+router.post("/item/create", checkUniqueItem, (req, res) =>{
 
     sequelize.query('SELECT * FROM admin WHERE isLogged = "true"',{
         type: Sequelize.QueryTypes.SELECT
@@ -59,6 +59,41 @@ router.post("/create_item", checkUniqueItem, (req, res) =>{
             }
         }
     }).catch(err => console.log(err))
+});
+
+function checkItemExists (req, res, next){
+    const {item_code} = req.body;
+    console.log(item_code);
+    sequelize.query('SELECT * FROM items WHERE item_code = :code ',{
+        type: Sequelize.QueryTypes.SELECT,
+        replacements: {
+            code: item_code
+        }
+    }).then((response) =>{
+        if (response == "") {
+            res.status(404).json({err: "Ups. The requested item does not exist. Please check again."});
+        } else{
+            next();
+        }
+    });
+}
+
+// ! Check effectiveness of this query
+router.put("item/modify", checkItemExists, (req, res) =>{
+    const {name, photo_url, price, item_description, cooking_time, quantity, item_code} = req.body;
+    sequelize.query('UPDATE item set name = :name, photo_url = :photo_url, price = :price, item_description = :item_description, cooking_time = :cooking_time, quantity = :quantity, item_code = :item_code',{
+        replacements: {
+            name,
+            photo_url,
+            price, 
+            item_description,
+            cooking_time,
+            quantity,
+            item_code
+        }
+    }).then((response) =>{
+        res.status(201).json({msg: `Item ${name} succesfully updated`})
+    }).catch(err => console.log(err));
 });
 
 module.exports = router;
