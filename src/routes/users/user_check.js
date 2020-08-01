@@ -13,8 +13,8 @@ function userbyID(req, res, next) {
         }
     }).then((users) =>{
         req.params.found = users;
-        if (users == "") {
-            res.status(404).json({err: "The requested order does not exist."});                        
+        if (users == " ") {
+            res.status(404).json({err: "The requested user does not exist."});                        
         } else{
             next();
         }
@@ -25,7 +25,11 @@ router.get("/users", (req, res) =>{
     sequelize.query('SELECT * FROM users',{
         type: sequelize.QueryTypes.SELECT
     }).then((users) =>{
-        res.status(200).json(users);
+        if (users = " ") {
+            res.status(200).json({msg: "No users registered yet"});
+        } else{
+            res.status(200).json(users)
+        } 
     }).catch((err) =>{
         console.log(err);
     })
