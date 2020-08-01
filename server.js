@@ -9,6 +9,7 @@ const app = express();
 // Routes
 app.use("/delilah", require("./src/routes/users/user_check"));
 app.use("/delilah", require("./src/routes/users/user_signup"));
+app.use("/delilah", require("./src/routes/users/user-login"));
 app.use("/delilah", require("./src/routes/items/item_registry"));
 app.use("/delilah", require("./src/routes/items/item-check"));
 app.use("/delilah", require("./src/routes/orders/create-order"));
