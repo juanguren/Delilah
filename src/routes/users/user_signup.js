@@ -7,11 +7,6 @@ const bcrypt = require("bcrypt");
 
 const sRounds = 10;
 
-// TODO: Add this method to a login endpoint
-bcrypt.compare("hey", "$2b$10$umfY74q0qVETPz3d8HxmyOerLbiD2vSk5MsES4GqjPkr1mftIV01G", (err, result) =>{
-    console.log(result);
-})
-
 router.use(body_parser.json());
 
 // "/signup" | Validate uniqueness of the username
@@ -20,51 +15,53 @@ function validateUsernameExists(req, res, next){
     
     sequelize.query('SELECT * FROM users WHERE username = :username', {
         type: sequelize.QueryTypes.SELECT,
-        replacements:{username: username}
+        replacements:{username}
     }).then((response) =>{
         if (response == "") {
             next();
         } else{
+            console.log(response);
             res.status(404).json({err: "User already exists"});            
         }
     }).catch(err => console.log(err))
 }
 
-function encryptPassword(req, res, next){
-    const {username, password} = req.body;
+function createUser(req, res, next){
+    const { fullName, email, phone, user_address, user_password, username, is_admin } = req.body; // ! hash is null..
 
-    bcrypt.hash(password, sRounds, (err, hash) =>{
+    sequelize.query('INSERT INTO users VALUES (NULL, :fullName, :email, :phone, :user_address, :user_password, :username, :is_admin, NULL, NULL)', {
+        replacements: {
+            fullName,
+            email,
+            phone,
+            user_address,
+            user_password,
+            username,
+            is_admin
+        }
+    }).then((response) =>{
+        next();
+    }).catch(err => res.json(err));
+}
+
+router.post("/user/signup", [validateUsernameExists, createUser], (req, res) =>{
+    const {username, user_password} = req.body;
+
+    bcrypt.hash(user_password, sRounds, (err, hash) =>{
         if (hash) {
-            sequelize.query('UPDATE users SET hash = :hash WHERE username = :username',{
+            sequelize.query('UPDATE users SET hash = :hash WHERE username = :username AND user_password = :user_password',{
                 replacements: {
                     hash,
-                    username
+                    username,
+                    user_password
                 }
-            }).then(response => console.log(response)
-            ).catch(error => console.log(error));
-
-            next();
+            }).then((response) =>{
+                res.status(201).json({msg: "User created succesfully"});
+            }).catch(e => res.status(400).json(e));
         } else{
             res.status(400).json({err});
         }
     });
-}
-
-router.post("/user_signup", [validateUsernameExists, encryptPassword], (req, res) =>{
-    const { fullName, email, phone, address, username, password } = req.body; // ! hash is null..
-
-    sequelize.query('INSERT INTO users VALUES (NULL, :fullName, :email, :phone, :address, :username, :password)', {
-        replacements: {
-            fullName: fullName,
-            email: email,
-            phone: phone,
-            address: address,
-            username: username,
-            password: password
-        }
-    }).then((response) =>{
-        res.json(response);
-    }).catch(err => res.json(err));
 });
 
 module.exports = router;
