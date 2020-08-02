@@ -25,10 +25,10 @@ router.get("/users", (req, res) =>{
     sequelize.query('SELECT * FROM users',{
         type: sequelize.QueryTypes.SELECT
     }).then((users) =>{
-        if (users = " ") {
-            res.status(200).json({msg: "No users registered yet"});
-        } else{
+        if (users) {
             res.status(200).json(users)
+        } else{
+            res.status(200).json({msg: "No users registered yet"});
         } 
     }).catch((err) =>{
         console.log(err);
