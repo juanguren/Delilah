@@ -1,5 +1,6 @@
 
 const jwt = require("jsonwebtoken");
+const signature = "mySignature";
 
 const authUser = (req, res, next) =>{
     const getToken = req.headers.authorization.split(' ')[1]; // * Split divides the "Bearer" from the actual token. [1] is the position in which the token´s found.
