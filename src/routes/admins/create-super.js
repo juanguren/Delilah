@@ -10,7 +10,23 @@ const signature = "mySignature";
 
 router.use(body_parser.json()); 
 
-router.post("/create-super", (req, res) =>{
+const avoidRepeats = (req, res, next) =>{
+    const {username} = req.body
+    sequelize.query('SELECT super_admin.username FROM super_admin WHERE username = :username',{
+        type: Sequelize.QueryTypes.SELECT,
+        replacements: {
+            username
+        }
+    }).then((fields) =>{
+        if (fields) {
+            res.status(400).json({err: "There´s already a super user with that same username"});
+        } else{
+            next();
+        }
+    }).catch(err => console.log(err));
+}
+
+router.post("/create-super", avoidRepeats, (req, res) =>{
     const { fullName, super_address, username, password, isLogged } = req.body;
     if (req.body) {
         sequelize.query('INSERT into super_admin VALUES (NULL, :fullName, :super_address, :username, :password, :isLogged)',{
