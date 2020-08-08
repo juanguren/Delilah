@@ -48,8 +48,7 @@ router.post("/item/create", checkUniqueItem, (req, res) =>{
                     }
                 }).then((response) =>{
                     if (response = "") {
-                        res.status(400).json({err: "There was an error loading this query. \n please try again or" + 
-                    " contact your admin"});
+                        res.status(400).json({err: "There was an error loading this query. \n please try again or contact your admin"});
                     } else{
                         res.status(200).json({msg: `Item ${name} uploaded succesfuly`})
                     }
@@ -79,9 +78,9 @@ function checkItemExists (req, res, next){
 }
 
 // ! Check effectiveness of this query
-router.put("item/modify", checkItemExists, (req, res) =>{
+router.put("/item/update", checkItemExists, (req, res) =>{
     const {name, photo_url, price, item_description, cooking_time, quantity, item_code} = req.body;
-    sequelize.query('UPDATE item set name = :name, photo_url = :photo_url, price = :price, item_description = :item_description, cooking_time = :cooking_time, quantity = :quantity, item_code = :item_code',{
+    sequelize.query('UPDATE items set name = :name, photo_url = :photo_url, price = :price, item_description = :item_description, cooking_time = :cooking_time, quantity = :quantity, item_code = :item_code WHERE item_code = :item_code',{
         replacements: {
             name,
             photo_url,
