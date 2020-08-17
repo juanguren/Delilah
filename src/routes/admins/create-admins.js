@@ -53,24 +53,29 @@ router.post("/admin/auth", validateWithJWT, (req, res) =>{
 });
 
 router.post("/admin-login", authUser, (req, res) =>{
-    let okUsername = req.params.loggedUser;
-    sequelize.query('SELECT username FROM admin WHERE username = :username',{
-        type: Sequelize.QueryTypes.SELECT,
-        replacements: {
-            username: okUsername
-        }
-    }).then((response) =>{
-        if (response) {
-            sequelize.query('UPDATE admin SET isLogged = "true" WHERE username = :username',{
-                replacements: {
-                    username: okUsername
-                }
-            }).then((response));
-            res.status(200).json({msg: `Admin *${okUsername}* succesfully logged in`});
-        } else{
-            res.status(404).json({err: "Not found"});
-        }
-    })
+    const okUsername = req.params.loggedUser;
+    const {username, password} = req.body;
+
+    if (username === okUsername) {
+        sequelize.query('SELECT username FROM admin WHERE username = :username AND password = :password',{
+            type: Sequelize.QueryTypes.SELECT,
+            replacements: {
+                username: okUsername,
+                password
+            }
+        }).then((response) =>{
+            if (response) {
+                sequelize.query('UPDATE admin SET isLogged = "true" WHERE username = :username',{
+                    replacements: {
+                        username: okUsername
+                    }
+                }).then((response));
+                res.status(200).json({msg: `Admin *${okUsername}* succesfully logged in`});
+            } else{
+                res.status(404).json({err: "Not found"});
+            }
+        })
+    } else{ res.status(404).json({err: "username or password is incorrect. Please check them and try again."}); }
 });
 
 router.post("/admin/:username/logout", (req, res) =>{
