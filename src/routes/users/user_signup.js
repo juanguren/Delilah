@@ -85,15 +85,19 @@ router.post("/user/auth", validateWithJWT, (req, res) =>{
 
 router.post("/user/login", authUser, (req, res) =>{
     const userIdentity = req.params.loggedUser;
-    const {username} = req.body; 
+    const {username, password} = req.body; 
+
     if (username === userIdentity) {
-        sequelize.query('UPDATE users SET isLogged = "true" WHERE username = :username',{
+        sequelize.query('UPDATE users SET isLogged = "true" WHERE username = :username AND password = :password',{
             replacements : {
-                username: userIdentity
+                username: userIdentity,
+                password
             }
         }).then(() =>{
-            res.status(200).json({msg: `Username *${userIdentity}* is succesfully logged in`});
+            res.status(200).json({msg: `Username *${userIdentity}* is now logged in`});
         }).catch(err => res.status(400).json(err));
+    } else{
+        res.status(404).json({err: "username or password is incorrect. Please check them and try again."});
     }
 });
 
