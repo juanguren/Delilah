@@ -2,10 +2,11 @@
 const express = require("express");
 const body_parser = require("body-parser");
 const router = express.Router();
-const {sequelize} = require("../../../server");
+const {sequelize, Sequelize} = require("../../../server");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authUser = require("../validations/authUser");
+const { json } = require("body-parser");
 const signature = "mySignature";
 
 const sRounds = 10;
@@ -21,7 +22,7 @@ function validateUsernameExists(req, res, next){
     const username = req.body.username;
     
     sequelize.query('SELECT * FROM users WHERE username = :username', {
-        type: sequelize.QueryTypes.SELECT,
+        type: Sequelize.QueryTypes.SELECT,
         replacements:{username}
     }).then((response) =>{
         if (response == "") {
@@ -85,20 +86,39 @@ router.post("/user/auth", validateWithJWT, (req, res) =>{
 
 router.post("/user/login", authUser, (req, res) =>{
     const userIdentity = req.params.loggedUser;
-    const {username, password} = req.body; 
+    const {username, user_password} = req.body; 
 
     if (username === userIdentity) {
-        sequelize.query('UPDATE users SET isLogged = "true" WHERE username = :username AND password = :password',{
+        sequelize.query('UPDATE users SET isLogged = "true" WHERE username = :username AND user_password = :password',{
             replacements : {
                 username: userIdentity,
-                password
+                password: user_password
             }
         }).then(() =>{
-            res.status(200).json({msg: `Username *${userIdentity}* is now logged in`});
+            res.status(200).json({msg: `User *${userIdentity}* is now logged in`});
         }).catch(err => res.status(400).json(err));
     } else{
         res.status(404).json({err: "username or password is incorrect. Please check them and try again."});
     }
+});
+
+router.post("/user/:username/logout", (req, res) =>{
+    const {username} = req.params;
+    sequelize.query('SELECT username FROM users WHERE username = :username',{
+        type: Sequelize.QueryTypes.SELECT,
+        replacements : {
+            username
+        }
+    }).then((user) =>{
+        const foundUser = user[0].username;
+        if (foundUser === username) {
+            sequelize.query('UPDATE users SET isLogged = "false" WHERE username = :username',{
+                replacements: {
+                    username
+                }
+            }).then(() => res.status(200).json({msg: `User ${foundUser} has logged out`}));
+        } else {res.status(404).json({msg: `User ${username} does not exist. Please try again`})}
+    }).catch(errSelect => res.status(400).json(errSelect));
 });
 
 module.exports = router;
