@@ -6,15 +6,10 @@ const {sequelize, Sequelize} = require("../../../server");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authUser = require("../validations/authUser");
-const { json } = require("body-parser");
 const signature = "mySignature";
 
 const sRounds = 10;
 
-/*req.headers['authorization'] = "84s4d44";
-const x = req.headers['authorization'];
-console.log(x);
-*/
 router.use(body_parser.json());
 
 // "/signup" | Validate uniqueness of the username
