@@ -1,5 +1,5 @@
 
-const { sequelize, Sequelize } = require("../../../server");
+const { sequelize, Sequelize } = require("../../server");
 const jwt = require("jsonwebtoken");
 const signature = "mySignature";
 
