@@ -3,8 +3,8 @@ const express = require("express");
 const body_parser = require("body-parser");
 const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
-const validateWithJWT = require("../validations/adminValidation");
-const authUser = require("../validations/authUser");
+const validateWithJWT = require("../../validations/adminValidation");
+const authUser = require("../../validations/authUser");
 
 router.use(body_parser.json());
 

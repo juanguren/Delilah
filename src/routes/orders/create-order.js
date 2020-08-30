@@ -3,7 +3,7 @@ const express = require("express");
 const body_parser = require("body-parser");
 const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
-const authUser = require("../validations/authUser");
+const authUser = require("../../validations/authUser");
 
 router.use(body_parser.json());
 
@@ -32,15 +32,15 @@ const makeOrder = (req, res, next) =>{
         }
     }).then((res) =>{
         const {user_id} = res[0]; // ! Create a utils folder for this dummy data
-        sequelize.query('INSERT INTO orders(order_time, arrival_time, order_status, canceled_order_id. user_id) VALUES(?, ?, ?, ?, ?)',{
+        sequelize.query('INSERT INTO orders(order_time, arrival_time, order_status, canceled_order_id. user_id) VALUES(?, ?, ?, NULL, ?)',{
             replacements: [
-
+                
             ]
         })
     })
 }
 
-router.post("/order", [authUser, isUserLoggedIn], (req, res) =>{
+router.post("/order", [authUser, isUserLoggedIn, makeOrder], (req, res) =>{
     
 })
 

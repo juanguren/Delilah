@@ -3,8 +3,8 @@ const express = require("express");
 const body_parser = require("body-parser");
 const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
-const validateWithJWT = require("../validations/superValidation");
-const authUser = require("../validations/authUser");
+const validateWithJWT = require("../../validations/superValidation");
+const authUser = require("../../validations/authUser");
 
 const signature = "mySignature";
 

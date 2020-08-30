@@ -5,7 +5,7 @@ const router = express.Router();
 const {sequelize, Sequelize} = require("../../../server");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const authUser = require("../validations/authUser");
+const authUser = require("../../validations/authUser");
 const signature = "mySignature";
 
 const sRounds = 10;
