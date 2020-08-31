@@ -1,10 +1,12 @@
 
 const moment = require("moment");
 
-export const orderTime = () =>{
+const orderTime = () =>{
     return new Date();
 }
 
-export const generateArrivalTime = () =>{
-    return moment(new Date()).add(35, "minutes");
+const generateArrivalTime = () =>{
+    return moment(new Date()).add(35, "minutes").toDate();
 }
+
+module.exports = { orderTime, generateArrivalTime };

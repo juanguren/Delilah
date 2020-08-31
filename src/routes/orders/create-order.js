@@ -1,6 +1,7 @@
 
 const express = require("express");
 const body_parser = require("body-parser");
+const uuid = require("uuid");
 const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
 const authUser = require("../../validations/authUser");
@@ -32,20 +33,28 @@ const makeOrder = (req, res, next) =>{
             user
         }
     }).then((res) =>{
-        const {user_id} = res[0]; // ! Create a utils folder for this dummy data
-        sequelize.query('INSERT INTO orders VALUES(NULL, :order_time, :arrival_time, :order_status, NULL, :user_id)',{
-            replacements: {
-                order_time: orderTime(),
-                arrival_time: generateArrivalTime(),
-                order_status: "PENDING",
-                user_id
-            }
-        })
-    })
+        const {user_id} = res[0];
+        const order_uuid = uuid.v4();
+        if (user_id) {
+            sequelize.query('INSERT INTO orders VALUES(NULL, :order_time, :arrival_time, :order_status, NULL, :user_id, :order_uuid)',{
+                replacements: {
+                    order_time: orderTime(),
+                    arrival_time: generateArrivalTime(),
+                    order_status: "PENDING",
+                    user_id,
+                    order_uuid
+                }
+            }).then((res) =>{
+                req.params.orderId = order_uuid;
+                next();
+            })
+        }
+    }).catch(err => res.status(400).json(err));
 }
 
 router.post("/order", [authUser, isUserLoggedIn, makeOrder], (req, res) =>{
-    console.log(true)
+    const orderCode = req.params.orderId;
+    res.status(200).json({msg: `Order succesful.`, ID: `${orderCode}`});
 })
 
 module.exports = router;
