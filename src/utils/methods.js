@@ -2,7 +2,7 @@
 const moment = require("moment");
 
 const orderTime = () =>{
-    return new Date();
+    return moment(new Date()).toDate();
 }
 
 const generateArrivalTime = () =>{
