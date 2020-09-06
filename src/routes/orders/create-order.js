@@ -65,7 +65,7 @@ const sendOrderItems = (req, res, next) =>{
     }).then((response) =>{
         const {order_id} = response[0];
 
-        const itemInfo = order.items.map((all) =>{
+        order.items.map((all) =>{
             let item_id = all.code;
             let ordered_quantity = all.quantity;
 
