@@ -8,7 +8,7 @@ const authUser = require("../../validations/authUser");
 
 router.use(body_parser.json());
 
-let isSuperAdminLogged = (req, res, next) =>{
+const isSuperAdminLogged = (req, res, next) =>{
     sequelize.query('SELECT * FROM super_admin WHERE isLogged = "true"',{
         type: Sequelize.QueryTypes.SELECT
     }).then((response) =>{

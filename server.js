@@ -17,6 +17,7 @@ app.use("/delilah", require("./src/routes/orders/cancel-order"));
 app.use("/delilah", require("./src/routes/orders/view-orders"));
 app.use("/delilah", require("./src/routes/admins/create-super"));
 app.use("/delilah", require("./src/routes/admins/create-admins"));
+app.use("/delilah", require("./src/routes/admins/adminActions"));
 
 app.get("/delilah", (req, res) =>{
     res.json({msg: "Welcome to Delilah!",
