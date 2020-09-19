@@ -59,9 +59,7 @@ const sendOrderItems = (req, res, next) =>{
 
     sequelize.query('SELECT order_id FROM orders WHERE order_uuid = :order_id',{
         type: Sequelize.QueryTypes.SELECT,
-        replacements: {
-            order_id: order_uuid
-        }
+        replacements: { order_id: order_uuid }
     }).then((response) =>{
         const {order_id} = response[0];
 
