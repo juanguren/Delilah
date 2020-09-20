@@ -23,7 +23,7 @@ const isSuperAdminLogged = (req, res, next) =>{
     }).catch(err => res.status(404).json({err}));
 }
 
-router.post("/create-admin", isSuperAdminLogged, (req, res) =>{ // ! Inject super's ID into admin
+router.post("/create-admin", isSuperAdminLogged, (req, res) =>{
     const { fullName, admin_address, phone, isLogged, username, password } = req.body;
     if (req.body) {
         sequelize.query('INSERT into admin VALUES (NULL, :fullName, :admin_address, :phone, NULL, :isLogged, :username, :password)',{
