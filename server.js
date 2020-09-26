@@ -16,7 +16,6 @@ app.use("/delilah", require(routes + "users/user-login"));
 app.use("/delilah", require(routes + "items/item_registry"));
 app.use("/delilah", require(routes + "items/item-check"));
 app.use("/delilah", require(routes + "orders/create-order"));
-app.use("/delilah", require(routes + "orders/cancel-order"));
 app.use("/delilah", require(routes + "orders/view-orders"));
 app.use("/delilah", require(routes + "admins/create-super"));
 app.use("/delilah", require(routes + "admins/create-admins"));

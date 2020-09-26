@@ -59,7 +59,7 @@ router.put("order/:id/cancel", cancelOrder, (req, res) =>{
     sequelize.query('UPDATE orders SET order_status = :newStatus WHERE order_uuid = :order_id', {
         replacements: { newStatus, order_id }
     }).then(() =>{
-        res.status(200).json({msg: 'Order succesfully updated'})
+        res.status(200).json({msg: 'Order succesfully cancelled'})
     }).catch((e) => res.status(400).json(e));
 });
 
