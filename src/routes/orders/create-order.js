@@ -25,6 +25,33 @@ const isUserLoggedIn = (req, res, next) =>{
     }).catch(err => res.status(400).json(err))
 }
 
+const checkStock = (req, res, next) =>{ // ! TODO: Check its behaviour with multiple items
+    const order = req.body;
+
+    order.items.map((all) =>{
+        let id = all.id;
+        let ordered_quantity = all.quantity;
+        sequelize.query('SELECT quantity FROM items WHERE item_id = :id', {
+            type: Sequelize.QueryTypes.SELECT,
+            replacements: { id }
+        }).then((res) =>{
+            res.map((values) =>{
+                let { quantity } = values;
+                let finalQuantity = quantity - ordered_quantity;
+                if (finalQuantity <= 0) {
+                    res.status(404).json({err: 'Item is out of stock'});
+                } else {
+                    sequelize.query('UPDATE items SET quantity = :finalQuantity WHERE item_id = :id', {
+                        replacements: { finalQuantity, id }
+                    }).then(() =>{
+                        next();
+                    }).catch(e => res.status(400).json(e))
+                }
+            })
+        }).catch(e => res.status(400).json(e))
+    })
+}
+
 const makeOrder = (req, res, next) =>{
     const user = req.params.loggedUser;
     sequelize.query('SELECT user_id FROM users WHERE username = :user',{
@@ -64,7 +91,7 @@ const sendOrderItems = (req, res, next) =>{
         const {order_id} = response[0];
 
         order.items.map((all) =>{
-            let item_id = all.code;
+            let item_id = all.id;
             let ordered_quantity = all.quantity;
 
             sequelize.query('INSERT INTO order_items VALUES(NULL, :order_id, :item_id, :ordered_quantity)',{
@@ -84,7 +111,15 @@ const sendOrderItems = (req, res, next) =>{
     }).catch(err => res.status(400).json(err))
 }
 
-router.post("/order", [authUser, isUserLoggedIn, makeOrder, sendOrderItems], (req, res) =>{
+router.post("/order", [
+    authUser,
+    isUserLoggedIn,
+    checkStock,
+    makeOrder,
+    sendOrderItems
+], 
+(req, res) =>{
+    
     const orderCode = req.params.orderId;
     res.status(200).json(
         {
