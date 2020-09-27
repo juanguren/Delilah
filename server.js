@@ -20,7 +20,7 @@ app.use("/delilah", require(routes + "orders/cancel-order"));
 app.use("/delilah", require(routes + "orders/view-orders"));
 app.use("/delilah", require(routes + "admins/create-super"));
 app.use("/delilah", require(routes + "admins/create-admins"));
-//app.use("/delilah", require(routes + "admins/admin-actions"));
+app.use("/delilah", require(routes + "admins/admin-actions"));
 
 app.get("/delilah", (req, res) =>{
     res.json({msg: "Welcome to Delilah!",

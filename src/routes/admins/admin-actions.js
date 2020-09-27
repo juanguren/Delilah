@@ -13,7 +13,7 @@ const updateOrderStatus = (req, res, next) =>{
 
     const acceptedStatus = [
         'PENDING',
-        'IN PROGRESS'
+        'IN_PROGRESS'
     ]
     acceptedStatus.includes(order_status) ? next() : res.status(400).json({msg: 'Incorrect status entry. Please input a valid one', acceptedStatus});
 }
@@ -62,3 +62,5 @@ router.put("order/:id/cancel", cancelOrder, (req, res) =>{
         res.status(200).json({msg: 'Order succesfully updated'})
     }).catch((e) => res.status(400).json(e));
 });
+
+module.exports = router;
