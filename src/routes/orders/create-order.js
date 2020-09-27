@@ -88,7 +88,7 @@ router.post("/order", [authUser, isUserLoggedIn, makeOrder, sendOrderItems], (re
     const orderCode = req.params.orderId;
     res.status(200).json(
         {
-            msg: `Order succesful.`,
+            msg: `Order succesfully created`,
             ID: `${orderCode}`
         }
     );
