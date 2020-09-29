@@ -1,7 +1,8 @@
 
 const { sequelize, Sequelize } = require("../../server");
 const jwt = require("jsonwebtoken");
-const signature = "mySignature";
+require('dotenv').config();
+const signature = process.env.signature;
 
 let validateWithJWT = (req, res, next) =>{
     const { username, password } = req.body;
