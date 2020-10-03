@@ -42,7 +42,7 @@ function orderbyID (req, res, next) {
     }).then((orders) =>{
         const { order_id } = orders[0];
         sequelize.query(
-        `SELECT items.name as Item, items.price, items.photo_url, o.*
+        `SELECT items.name as Items, items.price, items.photo_url, o.*
         FROM items
         INNER JOIN order_items ON items.item_id = order_items.item_id
         INNER JOIN orders o ON o.order_id = order_items.order_id
