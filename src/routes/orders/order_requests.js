@@ -25,7 +25,12 @@ router.get("/orders", [authUser, isAdminLoggedIn], (req, res) =>{
     }).catch(err => res.status(400).json(err));
 });
 
-router.get("/order/:id", [authUser, isAdminLoggedIn, orderbyID], (req, res) =>{
+router.get("/order/:id", [
+    authUser,
+    isAdminLoggedIn,
+    orderbyID
+],
+    (req, res) =>{
     let foundOrder = req.params.found;
     res.status(200).json(foundOrder);
 });
@@ -38,7 +43,6 @@ router.post("/order", [
     sendOrderItems
 ], 
 (req, res) =>{
-    
     const orderCode = req.params.orderId;
     res.status(200).json(
         {
@@ -46,6 +50,6 @@ router.post("/order", [
             ID: `${orderCode}`
         }
     );
-})
+});
 
 module.exports = router;
