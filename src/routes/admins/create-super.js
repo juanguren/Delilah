@@ -96,7 +96,7 @@ router.post("/super/:username/logout", (req, res) =>{
 });
 
 // Quick view (existing super)
-router.get("/super", (req, res) =>{
+router.get("/super", authUser, (req, res) =>{
     sequelize.query('SELECT * FROM super_admin',{
         type: Sequelize.QueryTypes.SELECT
     }).then((response) =>{

@@ -98,7 +98,7 @@ router.post("/admin/:username/logout", (req, res) =>{
     }).catch(err => res.status(404).json(err));
 });
 
-router.get("/admin", (req, res) =>{
+router.get("/admin", authUser, (req, res) =>{
     sequelize.query('SELECT * FROM admin',{
         type: Sequelize.QueryTypes.SELECT
     }).then((response) =>{

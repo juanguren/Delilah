@@ -1,6 +1,5 @@
 
 const jwt = require("jsonwebtoken");
-require('dotenv').config();
 const signature = "mySignature";
 
 const authUser = (req, res, next) =>{

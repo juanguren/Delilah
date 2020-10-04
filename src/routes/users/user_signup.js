@@ -12,7 +12,6 @@ const sRounds = 10;
 
 router.use(body_parser.json());
 
-// "/signup" | Validate uniqueness of the username
 const validateUsernameExists = (req, res, next) => {
     const username = req.body.username;
     
