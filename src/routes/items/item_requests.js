@@ -6,7 +6,7 @@ const { sequelize, Sequelize } = require("../../../server");
 
 router.use(body_parser.json());
 
-function checkUniqueItem (req, res, next){
+const checkUniqueItem = (req, res, next) => {
     const {item_code} = req.body;
     console.log(item_code);
     sequelize.query('SELECT * FROM items WHERE item_code = :code ',{
@@ -23,6 +23,30 @@ function checkUniqueItem (req, res, next){
     });
 }
 
+router.get("/items", (req, res) =>{
+    sequelize.query('SELECT * FROM items',{
+        type: Sequelize.QueryTypes.SELECT
+    }).then((items) =>{
+        res.status(200).json(items);
+    }).catch((err) =>{
+        console.log(err);
+    });
+});
+
+router.get("items/:itemCode", (req, res) =>{
+    const itemID = req.params.itemCode;
+    sequelize.query('SELECT * FROM items WHERE item_code = :itemCode',{
+        type: Sequelize.QueryTypes.SELECT,
+        replacements: {
+            item_code: itemID
+        }
+    }).then((items) =>{
+        res.status(200).json(items);
+    }).catch((err) =>{
+        console.log(err);
+    });
+});
+
 router.post("/item/create", checkUniqueItem, (req, res) =>{
 
     sequelize.query('SELECT * FROM admin WHERE isLogged = "true"',{
@@ -34,7 +58,8 @@ router.post("/item/create", checkUniqueItem, (req, res) =>{
                 case2: "Admin is not yet logged in. Please make sure it is."
             })
         } else{
-            const {name, photo_url, price, item_description, cooking_time, quantity, item_code} = req.body;
+            const {name, photo_url, price, item_description, cooking_time, quantity, item_code}
+             = req.body;
             if (req.body) {
                 sequelize.query('INSERT INTO items VALUES (NULL, :name, :photo_url, :price, :item_description, :cooking_time, :quantity, :item_code)', {
                     replacements: {
@@ -60,9 +85,8 @@ router.post("/item/create", checkUniqueItem, (req, res) =>{
     }).catch(err => console.log(err))
 });
 
-function checkItemExists (req, res, next){
+const checkItemExists = (req, res, next) => {
     const {item_code} = req.body;
-    console.log(item_code);
     sequelize.query('SELECT * FROM items WHERE item_code = :code ',{
         type: Sequelize.QueryTypes.SELECT,
         replacements: {
@@ -77,9 +101,17 @@ function checkItemExists (req, res, next){
     });
 }
 
-// ! Check effectiveness of this query
 router.put("/item/update", checkItemExists, (req, res) =>{
-    const {name, photo_url, price, item_description, cooking_time, quantity, item_code} = req.body;
+    const {
+        name,
+        photo_url,
+        price,
+        item_description,
+        cooking_time,
+        quantity,
+        item_code
+    } = req.body;
+    
     sequelize.query('UPDATE items set name = :name, photo_url = :photo_url, price = :price, item_description = :item_description, cooking_time = :cooking_time, quantity = :quantity, item_code = :item_code WHERE item_code = :item_code',{
         replacements: {
             name,

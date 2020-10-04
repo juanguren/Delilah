@@ -1,16 +1,20 @@
 
 const jwt = require("jsonwebtoken");
 require('dotenv').config();
-const signature = process.env.signature;
+const signature = "mySignature";
 
 const authUser = (req, res, next) =>{
-    const getToken = req.headers.authorization.split(' ')[1]; // * Split divides the "Bearer" from the actual token. [1] is the position in which the token´s found.
-    const verifyToken = jwt.verify(getToken, signature);
-    if (verifyToken) {
-        req.params.loggedUser = verifyToken;
-        next();
-    } else{
-        res.status(404).json({err: "Something failed in the authentication process. Please check the Bearer Token"});
+    try {
+        const getToken = req.headers.authorization.split(' ')[1]; // * Split divides the "Bearer" from the actual token. [1] is the position in which the token´s found.
+        const verifyToken = jwt.verify(getToken, signature);
+        if (verifyToken) {
+            req.params.loggedUser = verifyToken;
+            next();
+        } else{
+            res.status(404).json({err: "Something failed in the authentication process. Please check the Bearer Token"});
+        }
+    } catch (error) {
+        res.status(403).json({msg: "Please check the Bearer Token"})
     }
 }
 

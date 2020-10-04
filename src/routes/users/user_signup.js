@@ -13,7 +13,7 @@ const sRounds = 10;
 router.use(body_parser.json());
 
 // "/signup" | Validate uniqueness of the username
-function validateUsernameExists(req, res, next){
+const validateUsernameExists = (req, res, next) => {
     const username = req.body.username;
     
     sequelize.query('SELECT * FROM users WHERE username = :username', {
@@ -28,8 +28,8 @@ function validateUsernameExists(req, res, next){
     }).catch(err => console.log(err))
 }
 
-function createUser(req, res, next){
-    const { fullName, email, phone, user_address, user_password, username, is_admin } = req.body; // ! hash is null..
+const createUser = (req, res, next) => {
+    const { fullName, email, phone, user_address, user_password, username, is_admin } = req.body;
 
     sequelize.query('INSERT INTO users VALUES (NULL, :fullName, :email, :phone, :user_address, :user_password, :username, :is_admin, NULL, NULL)', {
         replacements: {
