@@ -19,7 +19,7 @@ app.use("/delilah", require(routes + "admins/create-admins"));
 app.use("/delilah", require(routes + "admins/admin-actions"));
 
 app.get("/delilah", (req, res) =>{
-    res.json({msg: "Welcome to Delilah!",
+    res.status(200).json({msg: "Welcome to Delilah!",
     us: "We are a new and revolutionary service that gives you time. Therefore, freedom."});
 })
 
