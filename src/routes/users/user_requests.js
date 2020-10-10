@@ -4,46 +4,37 @@ const body_parser = require("body-parser");
 const router = express.Router();
 const {sequelize, Sequelize} = require("../../../server");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const authUser = require("../../validations/authUser");
-const signature = "mySignature";
+const {
+    userbyID,
+    validateUsernameExists,
+    createUser,
+    validateWithJWT,
+    validateHash
+} 
+= require("./user_middlewares");
 
 const sRounds = 10;
-
 router.use(body_parser.json());
 
-const validateUsernameExists = (req, res, next) => {
-    const username = req.body.username;
-    
-    sequelize.query('SELECT * FROM users WHERE username = :username', {
-        type: Sequelize.QueryTypes.SELECT,
-        replacements:{username}
-    }).then((response) =>{
-        if (response == "") {
-            next();
+router.get("/users", (req, res) =>{
+    sequelize.query('SELECT * FROM users',{
+        type: Sequelize.QueryTypes.SELECT
+    }).then((users) =>{
+        if (users) {
+            res.status(200).json(users)
         } else{
-            res.status(404).json({err: "User already exists"});            
-        }
-    }).catch(err => console.log(err))
-}
+            res.status(200).json({msg: "No users registered yet"});
+        } 
+    }).catch((err) =>{
+        console.log(err);
+    })
+});
 
-const createUser = (req, res, next) => {
-    const { fullName, email, phone, user_address, user_password, username, is_admin } = req.body;
-
-    sequelize.query('INSERT INTO users VALUES (NULL, :fullName, :email, :phone, :user_address, :user_password, :username, :is_admin, NULL, NULL)', {
-        replacements: {
-            fullName,
-            email,
-            phone,
-            user_address,
-            user_password,
-            username,
-            is_admin
-        }
-    }).then((response) =>{
-        next();
-    }).catch(err => res.json(err));
-}
+router.get("users/:id", userbyID, (req, res) =>{
+    let foundUser = req.params.found;
+    res.status(200).json(foundUser);
+})
 
 router.post("/user/signup", [validateUsernameExists, createUser], (req, res) =>{
     const {username, user_password} = req.body;
@@ -65,12 +56,6 @@ router.post("/user/signup", [validateUsernameExists, createUser], (req, res) =>{
     });
 });
 
-const validateWithJWT = (req, res, next) =>{
-    const {username} = req.body;
-    req.params.token = jwt.sign(username, signature);
-    next();
-}
-
 router.post("/user/auth", validateWithJWT, (req, res) =>{
     const {username} = req.body;
     const adminToken = req.params.token;
@@ -78,9 +63,9 @@ router.post("/user/auth", validateWithJWT, (req, res) =>{
         adminToken});
 });
 
-router.post("/user/login", authUser, (req, res) =>{
+router.post("/user/login", [authUser, validateHash], (req, res) =>{
     const userIdentity = req.params.loggedUser;
-    const {username, user_password} = req.body; 
+    const { username, user_password } = req.body; 
 
     if (username === userIdentity) {
         sequelize.query('UPDATE users SET isLogged = "true" WHERE username = :username AND user_password = :password',{
@@ -89,7 +74,7 @@ router.post("/user/login", authUser, (req, res) =>{
                 password: user_password
             }
         }).then(() =>{
-            res.status(200).json({msg: `User *${userIdentity}* is now logged in`});
+            res.status(200).json({msg: `Success! User *${userIdentity}* is now logged in`});
         }).catch(err => res.status(400).json(err));
     } else{
         res.status(404).json({err: "username or password is incorrect. Please check them and try again."});
@@ -114,5 +99,19 @@ router.post("/user/:username/logout", (req, res) =>{
         } else {res.status(404).json({msg: `User ${username} does not exist. Please try again`})}
     }).catch(errSelect => res.status(400).json(errSelect));
 });
+
+router.post("/user/:username/logout", (req, res) =>{
+    const username = req.params.username;
+    if (username) {
+        sequelize.query('UPDATE users set isLogged = "false" WHERE username = :username', {
+            replacements: {
+                username
+            }
+        }).then(() =>{
+            res.status(200).json({msg: `Operation succesful. User *${username}* logged out`});
+        }).catch(e => res.status(400).json(e));
+    }
+});
+
 
 module.exports = router;

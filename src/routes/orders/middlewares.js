@@ -148,6 +148,39 @@ const orderbyID = (req, res, next) => {
     }).catch(() => res.status(400).json({err: 'Order not found'}));
 }
 
+const cancelOrder = (req, res, next) =>{
+    const id = req.params.id;
+    const { reason } = req.body;
+
+    if(reason){
+        sequelize.query('SELECT order_id FROM orders WHERE order_uuid = :order_id', {
+            type: Sequelize.QueryTypes.SELECT,
+            replacements: { order_id : id }
+        }).then((response) =>{
+            const { order_id } = response[0];
+            sequelize.query('INSERT INTO canceled_order VALUES(:order_id, :reason, :time)',{
+                replacements: {
+                    order_id,
+                    reason,
+                    time: orderTime()
+                }
+            }).then(() => { next(); })
+        }).catch((error) => res.status(400).json({msg: 'Couldn´t update order as cancelled', error}))
+
+    } else { res.status(404).json({msg: 'No reason provided'}) }
+}
+
+const updateOrderStatus = (req, res, next) =>{
+    const order_status = req.params.status;
+    order_status.toUpperCase();
+
+    const acceptedStatus = [
+        'PENDING',
+        'IN_PROGRESS'
+    ]
+    acceptedStatus.includes(order_status) ? next() : res.status(400).json({msg: 'Incorrect status entry. Please input a valid one', acceptedStatus});
+}
+
 module.exports = 
 {
     isUserLoggedIn,
@@ -155,5 +188,7 @@ module.exports =
     makeOrder,
     sendOrderItems,
     isAdminLoggedIn,
-    orderbyID
+    orderbyID,
+    cancelOrder,
+    updateOrderStatus
 }

@@ -11,7 +11,9 @@ const {
     makeOrder,
     sendOrderItems,
     isAdminLoggedIn,
-    orderbyID
+    orderbyID,
+    cancelOrder,
+    updateOrderStatus
 } 
 = require("./middlewares");
 
@@ -35,7 +37,7 @@ router.get("/order/:id", [
     res.status(200).json(foundOrder);
 });
 
-router.post("/order", [
+router.post("/order/create", [
     authUser,
     isUserLoggedIn,
     checkStock,
@@ -50,6 +52,28 @@ router.post("/order", [
             ID: `${orderCode}`
         }
     );
+});
+
+router.put("order/:id/cancel", cancelOrder, (req, res) =>{
+    const order_id = req.params.id;
+    const newStatus = 'CANCELLED';
+
+    sequelize.query('UPDATE orders SET order_status = :newStatus WHERE order_uuid = :order_id', {
+        replacements: { newStatus, order_id }
+    }).then(() =>{
+        res.status(200).json({msg: 'Order succesfully cancelled'})
+    }).catch((e) => res.status(400).json(e));
+});
+
+router.put("/order/:id/:status", updateOrderStatus, (req, res) =>{
+    const order_id = req.params.id;
+    const newStatus = req.params.status;
+
+    sequelize.query('UPDATE orders SET order_status = :newStatus WHERE order_uuid = :order_id', {
+        replacements: { newStatus, order_id }
+    }).then(() =>{
+        res.status(200).json({msg: 'Order succesfully updated'})
+    }).catch((e) => res.status(400).json(e));
 });
 
 module.exports = router;

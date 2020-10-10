@@ -23,7 +23,7 @@ const isSuperAdminLogged = (req, res, next) =>{
     }).catch(err => res.status(404).json({err}));
 }
 
-router.post("/create-admin", isSuperAdminLogged, (req, res) =>{
+router.post("/admin/create", isSuperAdminLogged, (req, res) =>{
     const { fullName, admin_address, phone, isLogged, username, password } = req.body;
     if (req.body) {
         sequelize.query('INSERT into admin VALUES (NULL, :fullName, :admin_address, :phone, NULL, :isLogged, :username, :password)',{
@@ -52,7 +52,7 @@ router.post("/admin/auth", validateWithJWT, (req, res) =>{
         adminToken});
 });
 
-router.post("/admin-login", authUser, (req, res) =>{
+router.post("/admin/login", authUser, (req, res) =>{
     const okUsername = req.params.loggedUser;
     const {username, password} = req.body;
 
