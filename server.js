@@ -9,14 +9,11 @@ const routes = "./src/routes/";
 const app = express();
 
 // Routes
-app.use("/delilah", require(routes + "users/user_check"));
-app.use("/delilah", require(routes + "users/user_signup"));
-app.use("/delilah", require(routes + "users/user-login"));
+app.use("/delilah", require(routes + "admins/create-admins"));
+app.use("/delilah", require(routes + "admins/create-super"));
 app.use("/delilah", require(routes + "items/item_requests"));
 app.use("/delilah", require(routes + "orders/order_requests"));
-app.use("/delilah", require(routes + "admins/create-super"));
-app.use("/delilah", require(routes + "admins/create-admins"));
-app.use("/delilah", require(routes + "admins/admin-actions"));
+app.use("/delilah", require(routes + "users/user_requests"));
 
 app.get("/delilah", (req, res) =>{
     res.status(200).json({msg: "Welcome to Delilah!",
