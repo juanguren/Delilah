@@ -23,6 +23,22 @@ const checkUniqueItem = (req, res, next) => {
     });
 }
 
+const checkItemExists = (req, res, next) => {
+    const {item_code} = req.body;
+    sequelize.query('SELECT * FROM items WHERE item_code = :code ',{
+        type: Sequelize.QueryTypes.SELECT,
+        replacements: {
+            code: item_code
+        }
+    }).then((response) =>{
+        if (response == "") {
+            res.status(404).json({err: "Ups. The requested item does not exist. Please check again."});
+        } else{
+            next();
+        }
+    });
+}
+
 router.get("/items", (req, res) =>{
     sequelize.query('SELECT * FROM items',{
         type: Sequelize.QueryTypes.SELECT
@@ -84,22 +100,6 @@ router.post("/item/create", checkUniqueItem, (req, res) =>{
         }
     }).catch(err => console.log(err))
 });
-
-const checkItemExists = (req, res, next) => {
-    const {item_code} = req.body;
-    sequelize.query('SELECT * FROM items WHERE item_code = :code ',{
-        type: Sequelize.QueryTypes.SELECT,
-        replacements: {
-            code: item_code
-        }
-    }).then((response) =>{
-        if (response == "") {
-            res.status(404).json({err: "Ups. The requested item does not exist. Please check again."});
-        } else{
-            next();
-        }
-    });
-}
 
 router.put("/item/update", checkItemExists, (req, res) =>{
     const {

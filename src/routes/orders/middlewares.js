@@ -19,7 +19,7 @@ const isUserLoggedIn = (req, res, next) =>{
     }).catch(err => res.status(400).json(err))
 }
 
-const checkStock = (req, res, next) =>{ // ! TODO: Check its behaviour with multiple items
+const checkStock = (req, response, next) =>{ 
     const order = req.body;
 
     order.items.map((all) =>{
@@ -33,16 +33,16 @@ const checkStock = (req, res, next) =>{ // ! TODO: Check its behaviour with mult
                 let { quantity } = values;
                 let finalQuantity = quantity - ordered_quantity;
                 if (finalQuantity <= 0) {
-                    res.status(404).json({err: 'Item is out of stock'});
+                    response.status(400).json({err: `Item is out of stock`});
                 } else {
                     sequelize.query('UPDATE items SET quantity = :finalQuantity WHERE item_id = :id', {
                         replacements: { finalQuantity, id }
                     }).then(() =>{
                         next();
-                    }).catch(e => res.status(400).json(e))
+                    }).catch(e => response.status(400).json(e))
                 }
             })
-        }).catch(e => res.status(400).json(e))
+        }).catch((error) => response.status(400).json({msg: "Error"}))
     })
 }
 
@@ -66,7 +66,7 @@ const makeOrder = (req, res, next) =>{
                     user_id,
                     order_uuid
                 }
-            }).then((res) =>{
+            }).then(() =>{
                 req.params.orderId = order_uuid;
                 next();
             })
@@ -87,6 +87,7 @@ const sendOrderItems = (req, res, next) =>{
         order.items.map((all) =>{
             let item_id = all.id;
             let ordered_quantity = all.quantity;
+            console.log({item_id, ordered_quantity})
 
             sequelize.query('INSERT INTO order_items VALUES(NULL, :order_id, :item_id, :ordered_quantity)',{
                 replacements: {
@@ -95,14 +96,10 @@ const sendOrderItems = (req, res, next) =>{
                     ordered_quantity
                 }
             }).then((response) =>{
-                try {
-                    next();
-                } catch (error) {
-                    res.status(400).json(error)
-                }
-            }).catch(err => res.status(400).json(err))
+                response ? next() : res.status(400).json({msg: "Error"})
+            }).catch(err => res.status(400).json({msg: "Error 1", err}))
         })
-    }).catch(err => res.status(400).json(err))
+    }).catch(err => res.status({msg: "Error 2", err}))
 }
 
 const isAdminLoggedIn = (req, res, next) =>{
