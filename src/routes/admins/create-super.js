@@ -26,7 +26,7 @@ const avoidRepeats = (req, res, next) =>{
     }).catch(err => console.log(err));
 }
 
-router.post("/create-super", avoidRepeats, (req, res) =>{
+router.post("/super", avoidRepeats, (req, res) =>{
     const { fullName, super_address, username, password, isLogged } = req.body;
     if (req.body) {
         sequelize.query('INSERT into super_admin VALUES (NULL, :fullName, :super_address, :username, :password, :isLogged)',{
@@ -63,11 +63,14 @@ router.post("/super-login", authUser, (req, res) =>{
         }
     }).then((response) =>{
         if (response) {
-            sequelize.query('UPDATE super_admin SET isLogged = "true" WHERE username = :username',{
-                replacements: {
-                    username: okUsername
-                }
-            }).then((response));
+            sequelize.query(
+            `ALTER TABLE super_admin
+            ADD isLogged VARCHAR(5) NULL 
+            DEFAULT "true"`,
+            {
+                replacements: { username: okUsername }
+            }
+            ).then((response));
             res.status(200).json({msg: `Admin *${okUsername}* succesfully logged in`});
         } else{
             res.status(404).json({err: "Not found"});
