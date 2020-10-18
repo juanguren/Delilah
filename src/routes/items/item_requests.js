@@ -3,6 +3,8 @@ const express = require("express");
 const body_parser = require("body-parser");
 const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
+const authUser = require("../../validations/authUser");
+const isAdmin = require("../../validations/isAdmin");
 
 router.use(body_parser.json());
 
@@ -63,7 +65,11 @@ router.get("items/:itemCode", (req, res) =>{
     });
 });
 
-router.post("/item/create", checkUniqueItem, (req, res) =>{
+router.post("/item/create", [
+    checkUniqueItem,
+    authUser,
+    isAdmin
+], (req, res) =>{
 
     sequelize.query('SELECT * FROM admin WHERE isLogged = "true"',{
         type: Sequelize.QueryTypes.SELECT
@@ -101,7 +107,11 @@ router.post("/item/create", checkUniqueItem, (req, res) =>{
     }).catch(err => console.log(err))
 });
 
-router.put("/item/update", checkItemExists, (req, res) =>{
+router.put("/item/update", [
+    checkItemExists,
+    authUser,
+    isAdmin
+], (req, res) =>{
     const {
         name,
         photo_url,

@@ -5,6 +5,7 @@ const uuid = require("uuid");
 const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
 const authUser = require("../../validations/authUser");
+const isAdmin = require("../../validations/isAdmin");
 const {
     isUserLoggedIn,
     checkStock,
@@ -19,7 +20,11 @@ const {
 
 router.use(body_parser.json());
 
-router.get("/orders", [authUser, isAdminLoggedIn], (req, res) =>{
+router.get("/orders", [
+    authUser,
+    isAdmin,
+    isAdminLoggedIn
+], (req, res) =>{
     sequelize.query('SELECT * FROM orders',{
         type: Sequelize.QueryTypes.SELECT
     }).then((orders) =>{
@@ -29,6 +34,7 @@ router.get("/orders", [authUser, isAdminLoggedIn], (req, res) =>{
 
 router.get("/order/:id", [
     authUser,
+    isAdmin,
     isAdminLoggedIn,
     orderbyID
 ],
@@ -39,6 +45,7 @@ router.get("/order/:id", [
 
 router.post("/order/create", [
     authUser,
+    isAdmin,
     isUserLoggedIn,
     checkStock,
     makeOrder,
