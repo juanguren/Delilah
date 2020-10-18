@@ -27,9 +27,9 @@ const avoidRepeats = (req, res, next) =>{
 }
 
 router.post("/super", avoidRepeats, (req, res) =>{
-    const { fullName, super_address, username, password, isLogged } = req.body;
+    const { fullName, super_address, username, password } = req.body;
     if (req.body) {
-        sequelize.query('INSERT into super_admin VALUES (NULL, :fullName, :super_address, :username, :password, :isLogged)',{
+        sequelize.query('INSERT into super_admin VALUES (NULL, :fullName, :super_address, :username, :password)',{
             replacements: {
                 fullName,
                 super_address,
