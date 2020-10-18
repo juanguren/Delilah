@@ -67,8 +67,10 @@ router.post("/user/login", [authUser, validateHash], (req, res) =>{
     const userIdentity = req.params.loggedUser;
     const { username, user_password } = req.body; 
 
-    if (username === userIdentity) {
-        sequelize.query('UPDATE users SET isLogged = "true" WHERE username = :username AND user_password = :password',{
+    if (username === userIdentity) { 
+        sequelize.query(`
+        UPDATE users SET isLogged = "true"
+        WHERE username = :username AND user_password = :password`,{
             replacements : {
                 username: userIdentity,
                 password: user_password

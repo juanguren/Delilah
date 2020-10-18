@@ -6,7 +6,6 @@ const signature = "mySignature";
 
 const userbyID = (req, res, next) => {
     let ID = req.params.id;
-
     sequelize.query('SELECT * FROM users where user_id = :id',{
         type: Sequelize.QueryTypes.SELECT,
         replacements: {
@@ -39,8 +38,9 @@ const validateUsernameExists = (req, res, next) => {
 
 const createUser = (req, res, next) => {
     const { fullName, email, phone, user_address, user_password, username, is_admin } = req.body;
-
-    sequelize.query('INSERT INTO users VALUES (NULL, :fullName, :email, :phone, :user_address, :user_password, :username, :is_admin, NULL, NULL)', {
+    sequelize.query(`
+    INSERT INTO users VALUES
+    (NULL, :fullName, :email, :phone, :user_address, :user_password, :username, :is_admin, NULL, NULL)`, {
         replacements: {
             fullName,
             email,
