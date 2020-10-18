@@ -5,6 +5,7 @@ const router = express.Router();
 const {sequelize, Sequelize} = require("../../../server");
 const bcrypt = require("bcrypt");
 const authUser = require("../../validations/authUser");
+const isAdmin = require("../../validations/isAdmin");
 const {
     userbyID,
     validateUsernameExists,
@@ -17,7 +18,7 @@ const {
 const sRounds = 10;
 router.use(body_parser.json());
 
-router.get("/users", (req, res) =>{
+router.get("/users", [authUser, isAdmin], (req, res) =>{
     sequelize.query('SELECT * FROM users',{
         type: Sequelize.QueryTypes.SELECT
     }).then((users) =>{
@@ -31,7 +32,7 @@ router.get("/users", (req, res) =>{
     })
 });
 
-router.get("users/:id", userbyID, (req, res) =>{
+router.get("users/:id", [authUser, isAdmin], userbyID, (req, res) =>{
     let foundUser = req.params.found;
     res.status(200).json(foundUser);
 })
