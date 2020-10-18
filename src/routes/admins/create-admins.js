@@ -9,10 +9,12 @@ const authUser = require("../../validations/authUser");
 router.use(body_parser.json());
 
 const isSuperAdminLogged = (req, res, next) =>{
-    sequelize.query('SELECT * FROM super_admin WHERE isLogged = "true"',{
+    sequelize.query('SELECT super_id FROM super_admin WHERE isLogged = "true"',{
         type: Sequelize.QueryTypes.SELECT
     }).then((response) =>{
         if(response){
+            const { super_id } = response[0];
+            req.params.id = super_id;
             next();
         } else{
             res.status(400).json({
@@ -24,16 +26,21 @@ const isSuperAdminLogged = (req, res, next) =>{
 }
 
 router.post("/admin/create", isSuperAdminLogged, (req, res) =>{
-    const { fullName, admin_address, phone, isLogged, username, password } = req.body;
-    if (req.body) {
-        sequelize.query('INSERT into admin VALUES (NULL, :fullName, :admin_address, :phone, NULL, :isLogged, :username, :password)',{
+    const { fullName, admin_address, phone, password, username, is_admin } = req.body;
+    const super_id = req.params.id;
+    if (req.body) { 
+        sequelize.query(`
+        INSERT into admin
+        VALUES (NULL, :fullName, :admin_address, :phone, :super_id, :password, :username, :is_admin)`,
+         {
             replacements: {
                 fullName,
                 admin_address,
                 phone,
+                super_id,
                 username,
                 password,
-                isLogged
+                is_admin
             }
         }).then((response) =>{
             if (response = "") {
@@ -65,7 +72,10 @@ router.post("/admin/login", authUser, (req, res) =>{
             }
         }).then((response) =>{
             if (response) {
-                sequelize.query('UPDATE admin SET isLogged = "true" WHERE username = :username',{
+                sequelize.query(
+                `ALTER TABLE admin
+                ADD isLogged VARCHAR(5) NULL 
+                DEFAULT "true"`,{
                     replacements: {
                         username: okUsername
                     }
