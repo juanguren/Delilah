@@ -110,7 +110,8 @@ const isAdminLoggedIn = (req, res, next) =>{
             username
         }
     }).then((response) =>{
-        if (response[0].username === username) {
+        const { username: foundUser } = response[0];
+        if (foundUser === username) {
             next();
         } else{
             res.status(400).json({err: "Incorrect user credentials"});
