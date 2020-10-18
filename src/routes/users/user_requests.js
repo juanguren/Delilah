@@ -102,18 +102,4 @@ router.post("/user/:username/logout", (req, res) =>{
     }).catch(errSelect => res.status(400).json(errSelect));
 });
 
-router.post("/user/:username/logout", (req, res) =>{
-    const username = req.params.username;
-    if (username) {
-        sequelize.query('UPDATE users set isLogged = "false" WHERE username = :username', {
-            replacements: {
-                username
-            }
-        }).then(() =>{
-            res.status(200).json({msg: `Operation succesful. User *${username}* logged out`});
-        }).catch(e => res.status(400).json(e));
-    }
-});
-
-
 module.exports = router;
