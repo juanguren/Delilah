@@ -18,15 +18,11 @@ const avoidRepeats = (req, res, next) =>{
             username
         }
     }).then((fields) =>{
-        if (fields) {
-            res.status(400).json({err: "There´s already a super user with that same username"});
-        } else{
-            next();
-        }
+        fields ? res.status(400).json({err: "Username already exists"}) : next();
     }).catch(err => console.log(err));
 }
 
-router.post("/super", avoidRepeats, (req, res) =>{
+const createSuper = (req, res, next) => {
     const { fullName, super_address, username, password } = req.body;
     if (req.body) {
         sequelize.query('INSERT into super_admin VALUES (NULL, :fullName, :super_address, :username, :password)',{
@@ -39,19 +35,23 @@ router.post("/super", avoidRepeats, (req, res) =>{
             }
         }).then((response) =>{
             if (response = "") {
-                res.status(400).json({err: "There was an error creating this super admin. Please try again."})
+                res.status(422).json({err: "There was an error creating this super admin. Please try again."})
             } else{
-                res.status(201).json({msg: `Super admin ${fullName} created`});
+                next();
             }
         }).catch(err => console.log(err))
     }
-});
+}
 
-router.post("/auth", validateWithJWT, (req, res) =>{
+router.post("/super", [avoidRepeats, createSuper, validateWithJWT], (_req, res) =>{
     const username = req.body;
     const superToken = req.params.token;
-    res.status(201).json({msg: `Admin *${username.username}* succesfully authenticated`,
-        superToken});
+
+    res.status(201).json(
+        {
+            msg: `Super admin ${username} created and authenticated`,
+            superToken
+        });
 });
 
 router.post("/super-login", authUser, (req, res) =>{
