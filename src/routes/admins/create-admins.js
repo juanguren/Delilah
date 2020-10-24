@@ -25,9 +25,10 @@ const isSuperAdminLogged = (req, res, next) =>{
     }).catch(err => res.status(404).json({err}));
 }
 
-router.post("/admin/create", isSuperAdminLogged, (req, res) =>{
+router.post("/admin/create", [isSuperAdminLogged, validateWithJWT], (req, res) =>{
     const { fullName, admin_address, phone, password, username, is_admin } = req.body;
     const super_id = req.params.id;
+    const adminToken = req.params.token;
     if (req.body) { 
         sequelize.query(`
         INSERT into admin
@@ -46,17 +47,13 @@ router.post("/admin/create", isSuperAdminLogged, (req, res) =>{
             if (response = "") {
                 res.status(400).json({err: "There was an error creating this admin. Please try again."})
             } else{
-                res.status(201).json({msg: `Admin ${fullName} created`});
+                res.status(201).json({
+                    msg: `Admin ${fullName} created`,
+                    adminToken
+                });
             }
         }).catch(err => console.log(err))
     }
-});
-
-router.post("/admin/auth", validateWithJWT, (req, res) =>{
-    const username = req.body;
-    const adminToken = req.params.token;
-    res.status(201).json({msg: `Admin *${username.username}* succesfully authenticated`,
-        adminToken});
 });
 
 router.post("/admin/login", authUser, (req, res) =>{
