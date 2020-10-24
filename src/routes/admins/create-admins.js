@@ -49,7 +49,8 @@ router.post("/admin/create", [isSuperAdminLogged, validateWithJWT], (req, res) =
             } else{
                 res.status(201).json({
                     msg: `Admin ${fullName} created`,
-                    adminToken
+                    adminToken,
+                    hint: "Move this token to a 'Bearer Authentication' field next time you log in'"
                 });
             }
         }).catch(err => console.log(err))
