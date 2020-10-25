@@ -54,7 +54,7 @@ router.post("/super", [avoidRepeats, createSuper, validateWithJWT], (_req, res) 
         });
 });
 
-router.post("/super-login", authUser, (req, res) =>{
+router.post("/super_login", authUser, (req, res) =>{
     let okUsername = req.params.loggedUser;
     sequelize.query('SELECT username FROM super_admin WHERE username = :username',{
         type: Sequelize.QueryTypes.SELECT,
@@ -91,9 +91,9 @@ router.post("/super/:username/logout", (req, res) =>{
                 replacements: {
                     username
                 }
-            }).then(response1 => res.status(200).json({msg: `Admin ${username} succesfuly logged out`}));
+            }).then(() => res.status(200).json({msg: `Admin ${username} succesfuly logged out`}));
         } else{
-            res.status(404).json({err: "Logged out unsuccesful. Please try again"});
+            res.status(404).json({err: "Log out unsuccessful. Please try again"});
         }
     }).catch(err => res.status(404).json(err));
 });
