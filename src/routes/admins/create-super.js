@@ -104,7 +104,7 @@ router.get("/super", authUser, (req, res) =>{
         type: Sequelize.QueryTypes.SELECT
     }).then((response) =>{
         if (response == "") {
-            res.status(200).json({msg: "Empty field. There´s no super admin yet"}); 
+            res.status(204).json({msg: "Empty field. There´s no super admin yet"}); 
         } else{
             res.status(200).json({response});           
         }
