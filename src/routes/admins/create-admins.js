@@ -25,7 +25,7 @@ const isSuperAdminLogged = (req, res, next) =>{
     }).catch(err => res.status(404).json({err}));
 }
 
-router.post("/admin/create", [isSuperAdminLogged, validateWithJWT], (req, res) =>{
+router.post("/admin", [isSuperAdminLogged, validateWithJWT], (req, res) =>{
     const { fullName, admin_address, phone, password, username, is_admin } = req.body;
     const super_id = req.params.id;
     const adminToken = req.params.token;
@@ -45,7 +45,7 @@ router.post("/admin/create", [isSuperAdminLogged, validateWithJWT], (req, res) =
             }
         }).then((response) =>{
             if (response = "") {
-                res.status(400).json({err: "There was an error creating this admin. Please try again."})
+                res.status(401).json({err: "There was an error creating this admin. Please try again."})
             } else{
                 res.status(201).json({
                     msg: `Admin ${fullName} created`,
@@ -59,7 +59,7 @@ router.post("/admin/create", [isSuperAdminLogged, validateWithJWT], (req, res) =
 
 router.post("/admin/login", authUser, (req, res) =>{
     const okUsername = req.params.loggedUser;
-    const {username, password} = req.body;
+    const { username, password } = req.body;
 
     if (username === okUsername) {
         sequelize.query('SELECT username FROM admin WHERE username = :username AND password = :password',{
