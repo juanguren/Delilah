@@ -10,10 +10,10 @@ const authUser = (req, res, next) =>{
             req.params.loggedUser = verifyToken;
             next();
         } else{
-            res.status(404).json({err: "Something failed in the authentication process. Please check the Bearer Token"});
+            res.status(403).json({err: "Something failed in the authentication process. Please check the Bearer Token"});
         }
     } catch (error) {
-        res.status(403).json({msg: "Please check the Bearer Token"})
+        res.status(403).json({err: "Please check the Bearer Token"})
     }
 }
 
