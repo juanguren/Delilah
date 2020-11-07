@@ -29,31 +29,36 @@ router.post("/admin", [isSuperAdminLogged, validateWithJWT], (req, res) =>{
     const { fullName, admin_address, phone, password, username, is_admin } = req.body;
     const super_id = req.params.id;
     const adminToken = req.params.token;
-    if (req.body) { 
-        sequelize.query(`
-        INSERT into admin
-        VALUES (NULL, :fullName, :admin_address, :phone, :super_id, :password, :username, :is_admin)`,
-         {
-            replacements: {
-                fullName,
-                admin_address,
-                phone,
-                super_id,
-                username,
-                password,
-                is_admin
-            }
-        }).then((response) =>{
-            if (response = "") {
-                res.status(401).json({err: "There was an error creating this admin. Please try again."})
-            } else{
-                res.status(201).json({
-                    msg: `Admin ${fullName} created`,
-                    adminToken,
-                    hint: "Move this token to a 'Bearer Authentication' field next time you log in'"
-                });
-            }
-        }).catch(err => console.log(err))
+    try {
+        if (req.body) { 
+            sequelize.query(`
+            INSERT into admin (admin_id, fullName, admin_address, phone, super_id, password, username, is_admin, isLogged)
+            VALUES (NULL, :fullName, :admin_address, :phone, :super_id, :password, :username, :is_admin, :isLogged)`,
+             {
+                replacements: {
+                    fullName,
+                    admin_address,
+                    phone,
+                    super_id,
+                    username,
+                    password,
+                    is_admin,
+                    isLogged: "false"
+                }
+            }).then((response) =>{
+                if (response = "") {
+                    res.status(401).json({err: "There was an error creating this admin. Please try again."})
+                } else{
+                    res.status(201).json({
+                        msg: `Admin ${fullName} created`,
+                        adminToken,
+                        hint: "Move this token to a 'Bearer Authentication' field next time you log in'"
+                    });
+                }
+            }).catch(err => console.log(err))
+        }
+    } catch (error) {
+        res.status(400).json(error)
     }
 });
 
@@ -71,19 +76,19 @@ router.post("/admin/login", authUser, (req, res) =>{
         }).then((response) =>{
             if (response) {
                 sequelize.query(
-                `ALTER TABLE admin
-                ADD isLogged VARCHAR(5) NULL 
-                DEFAULT "true"`,{
+                `UPDATE admin
+                SET isLogged = 'true'
+                WHERE username = :username`,{
                     replacements: {
                         username: okUsername
                     }
                 }).then((response));
                 res.status(200).json({msg: `Admin *${okUsername}* succesfully logged in`});
             } else{
-                res.status(404).json({err: "Not found"});
+                res.status(204).json({err: "Not found"});
             }
         })
-    } else{ res.status(404).json({err: "username or password is incorrect. Please check them and try again."}); }
+    } else{ res.status(404).json({err: "Incorrect username or password. Please check them and try again."}); }
 });
 
 router.post("/admin/:username/logout", (req, res) =>{
@@ -99,9 +104,9 @@ router.post("/admin/:username/logout", (req, res) =>{
                 replacements: {
                     username
                 }
-            }).then(response1 => res.status(200).json({msg: `Admin ${username} succesfuly logged out`}));
+            }).then(() => res.status(200).json({msg: `Admin ${username} succesfuly logged out`}));
         } else{
-            res.status(404).json({err: "Logged out unsuccesful. Please try again"});
+            res.status(500).json({err: "Logged out unsuccesful. Please try again"});
         }
     }).catch(err => res.status(404).json(err));
 });
@@ -111,7 +116,7 @@ router.get("/admin", authUser, (req, res) =>{
         type: Sequelize.QueryTypes.SELECT
     }).then((response) =>{
         if (response == "") {
-            res.status(200).json({msg: "Empty field. There´s no super admin yet"}); 
+            res.status(202).json({msg: "No super admin yet"}); 
         } else{
             res.status(200).json(response);
         }
