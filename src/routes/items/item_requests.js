@@ -137,6 +137,32 @@ router.put("/items", [
     }).catch(err => console.log(err));
 });
 
-// ! Create DELETE request
+router.delete("/items", (req, res) => {
+    try {
+        const { item_code } = req.body;
+        sequelize.query(`
+        SELECT item_id, name FROM items
+        WHERE item_code = :item_code
+        `, {
+        type: Sequelize.QueryTypes.SELECT,
+        replacements: { item_code }
+    }).then((item) => {
+        if (item == "") {
+            return res.status(404).json({err: "Item doesn't exist"});
+        }
+        const { item_id, name } = item[0];
+        sequelize.query(`
+        DELETE FROM items
+        WHERE item_id = :item_id 
+        `, { replacements: { item_id } })
+        .then((r) => {
+            r != "" ? res.status(200).json({msg: `Item ${name} successfuly deleted`})
+            : res.status(500).json({err: "Server error"});
+        });
+    });
+    } catch (error) {
+        res.status(400).json({error})
+    }
+});
 
 module.exports = router;
