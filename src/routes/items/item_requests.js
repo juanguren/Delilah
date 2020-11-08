@@ -137,7 +137,7 @@ router.put("/items", [
     }).catch(err => console.log(err));
 });
 
-router.delete("/items/:itemCode", [
+router.delete("/items/delete/:itemCode", [
     authUser,
     isAdmin
 ], (req, res) => {
@@ -159,7 +159,7 @@ router.delete("/items/:itemCode", [
         WHERE item_id = :item_id 
         `, { replacements: { item_id } })
         .then((r) => {
-            r != "" ? res.status(200).json({msg: `Item ${name} successfuly deleted`})
+            r != "" ? res.status(202).json({msg: `Item ${name} successfuly deleted`})
             : res.status(500).json({err: "Server error"});
         });
     });
