@@ -1,0 +1,647 @@
+---
+openapi: 3.0.0
+info:
+  title: Delilah Restó
+  description: This is Delilah
+  contact:
+    email: juan_fe_7@live.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0-oas3
+servers:
+- url: http://localhost:5000/delilah
+tags:
+- name: Super Admin
+  description: Super admin module
+- name: Admin
+  description: Admin module
+- name: Items
+  description: Items module
+paths:
+  /super:
+    get:
+      tags:
+      - Super Admin
+      summary: gets super admin information
+      description: |
+        Simple GET method
+      operationId: getSuper
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/getSuperAdmin'
+        "400":
+          description: bad input parameter
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/superAdminError'
+        "403":
+          description: Missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bearerTokenError'
+        "404":
+          description: general error
+    post:
+      tags:
+      - Super Admin
+      summary: creation of super admins
+      description: Creates a super admin
+      operationId: createSuperAdmin
+      requestBody:
+        description: Admin credentials
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/superAdmin'
+      responses:
+        "201":
+          description: Super admin {username} created and authenticated, webToken
+        "400":
+          description: Username already exists
+        "422":
+          description: There was an error creating this super admin. Please try again.
+  /super_login:
+    post:
+      tags:
+      - Super Admin
+      summary: logs super admin
+      description: |
+        Log in as a previously created super admin
+      operationId: logSuper
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/logUser'
+        "403":
+          description: missing token
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/bearerTokenError'
+        "404":
+          description: Not found / General error
+      security:
+      - bearerAuth:
+        - JWT
+  /super/{username}/logout:
+    post:
+      tags:
+      - Super Admin
+      summary: logs out super admin
+      description: |
+        Log out super admin
+      operationId: logOutSuper
+      parameters:
+      - name: username
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    msg:
+                      type: string
+                      format: string
+                      example: Admin ${username} succesfuly logged out`}
+        "404":
+          description: response object
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    err:
+                      type: string
+                      format: string
+                      example: Log out unsuccessful. Please try again
+  /admin:
+    get:
+      tags:
+      - Admin
+      summary: Get admin information
+      operationId: getAdmin
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/logAdmin'
+        "202":
+          description: Accepted but incomplete
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    format: string
+                    example: No super admin yet
+        "403":
+          description: missing token
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/bearerTokenError'
+      security:
+      - bearerAuth:
+        - JWT
+    post:
+      tags:
+      - Admin
+      summary: Create regular admin
+      description: Creates a regular admin
+      operationId: createAdmin
+      requestBody:
+        description: Admin credentials
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/logAdmin'
+      responses:
+        "201":
+          description: Admin {fullName} created and authenticated, webToken
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    format: string
+                    example: Admin {fullName} created
+                  adminToken:
+                    type: string
+                    format: JWT
+                    example: JWT
+                  hint:
+                    type: string
+                    example: Move this token to a Bearer Authentication field next time you log in
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  case1:
+                    type: string
+                    format: string
+                    example: No super admin found. Please contact your system administrator
+                  case2:
+                    type: string
+                    format: string
+                    example: Super admin is not yet logged in. Please make sure it is
+        "401":
+          description: There was an error creating this admin. Please try again
+  /admin/login:
+    post:
+      tags:
+      - Admin
+      summary: Logs admin
+      description: |
+        Log in as a previously created regular admin
+      operationId: logAdmin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/logUser'
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                properties:
+                  msg:
+                    type: string
+                    example: Admin *{username}* succesfully logged in
+        "204":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Not found
+        "403":
+          description: missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bearerTokenError'
+        "404":
+          description: Incorrect credentials
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Incorrect username or password. Please check them and try again.
+      security:
+      - bearerAuth:
+        - JWT
+  /admin/{username}/logout:
+    post:
+      tags:
+      - Admin
+      summary: Log out
+      description: Logs out regular admin
+      operationId: adminLogOut
+      parameters:
+      - name: username
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    format: string
+                    example: Admin {username} succesfuly logged out
+        "404":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  err:
+                    type: string
+                    format: string
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  err:
+                    type: string
+                    format: string
+                    example: Logged out unsuccesful. Please try again
+  /items:
+    get:
+      tags:
+      - Items
+      summary: Get existing items
+      description: |
+        Get list of created items
+      operationId: getItem
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/createItem'
+    put:
+      tags:
+      - Items
+      summary: Update item
+      description: |
+        Updates existing item
+      operationId: updateItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createItem'
+      responses:
+        "201":
+          description: response object
+          content:
+            application/json:
+              schema:
+                properties:
+                  msg:
+                    type: string
+                    example: Item {name} successfully updated
+        "403":
+          description: no permissions
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: User is not admin
+        "422":
+          description: unprocessable entity
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Check all the fields are complete.
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: There was an error loading this query. \n please try again or contact your admin
+      security:
+      - bearerAuth:
+        - JWT
+    post:
+      tags:
+      - Items
+      summary: Create item
+      description: |
+        Creates new item that will be added to the menu
+      operationId: createItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createItem'
+      responses:
+        "201":
+          description: response object
+          content:
+            application/json:
+              schema:
+                properties:
+                  msg:
+                    type: string
+                    example: Item {name} uploaded successfully
+        "403":
+          description: no permissions
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: User is not admin
+        "422":
+          description: unprocessable entity
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Check all the fields are complete.
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: There was an error loading this query. \n please try again or contact your admin
+      security:
+      - bearerAuth:
+        - JWT
+  /items/{itemCode}:
+    get:
+      tags:
+      - Items
+      summary: Get item by code
+      description: |
+        Get item by code
+      operationId: getItemByCode
+      parameters:
+      - name: itemCode
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/createItem'
+  /items/delete/{itemCode}:
+    delete:
+      tags:
+      - Items
+      summary: Delete item
+      description: Deletes existing item from the menu. __Doesn't work with item(s) already included in an order.__
+      operationId: deleteItem
+      parameters:
+      - name: itemCode
+        in: path
+        description: Previously defined, unique code
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "202":
+          description: response object
+          content:
+            application/json:
+              schema:
+                properties:
+                  msg:
+                    type: string
+                    example: Item ${name} successfuly deleted
+        "403":
+          description: no permissions
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: User is not admin | Please check the Bearer Token
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: There was an error loading this query. \n please try again or contact your admin
+      security:
+      - bearerAuth:
+        - JWT
+components:
+  schemas:
+    createItem:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Kiwi Pizza
+        photo_url:
+          type: string
+        price:
+          type: number
+        item_description:
+          type: string
+        cooking_time:
+          type: string
+          example: 01:05:00
+        quantity:
+          type: number
+        item_code:
+          type: string
+    logAdmin:
+      type: object
+      properties:
+        fullName:
+          type: string
+          format: string
+        admin_address:
+          type: string
+          format: string
+        phone:
+          type: string
+          format: string
+        password:
+          type: string
+          format: string
+        username:
+          type: string
+          format: string
+        is_Admin:
+          type: boolean
+          format: boolean
+    logUser:
+      type: object
+      properties:
+        username:
+          type: string
+          format: string
+        password:
+          type: string
+          format: string
+    bearerTokenError:
+      type: object
+      properties:
+        msg:
+          type: string
+          format: string
+          example: Please check the Bearer Token
+    superAdminError:
+      type: object
+      properties:
+        err:
+          type: string
+          format: string
+          example: Empty field. There´s no super admin yet
+    getSuperAdmin:
+      type: object
+      properties:
+        fullName:
+          type: string
+          format: string
+        super_address:
+          type: string
+        username:
+          type: string
+          format: string
+        password:
+          type: string
+    superAdmin:
+      required:
+      - fullName
+      - password
+      - super_address
+      - username
+      type: object
+      properties:
+        fullName:
+          type: string
+          format: string
+          example: Super Manager
+        super_address:
+          type: string
+          example: Av epic 51
+        username:
+          type: string
+          format: string
+          example: superEpic51
+        password:
+          type: string
+          example: myPassword!*
+        manufacturer:
+          $ref: '#/components/schemas/Manufacturer'
+    Manufacturer:
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          example: ACME Corporation
+        homePage:
+          type: string
+          format: url
+          example: https://www.acme-corp.com
+        phone:
+          type: string
+          example: 408-867-5309
+    Schema:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
