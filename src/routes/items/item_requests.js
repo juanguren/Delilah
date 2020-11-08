@@ -137,12 +137,12 @@ router.put("/items", [
     }).catch(err => console.log(err));
 });
 
-router.delete("/items", [
+router.delete("/items/:itemCode", [
     authUser,
     isAdmin
 ], (req, res) => {
     try {
-        const { item_code } = req.body;
+        const { itemCode: item_code } = req.params;
         sequelize.query(`
         SELECT item_id, name FROM items
         WHERE item_code = :item_code
