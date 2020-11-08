@@ -32,12 +32,19 @@ router.get("/users", [authUser, isAdmin], (req, res) =>{
     })
 });
 
-router.get("users/:id", [authUser, isAdmin], userbyID, (req, res) =>{
+router.get("user/:id", [
+    authUser,
+    isAdmin,
+    userbyID
+], (req, res) =>{
     let foundUser = req.params.found;
     res.status(200).json(foundUser);
-})
+});
 
-router.post("/user/signup", [validateUsernameExists, createUser], (req, res) =>{
+router.post("/user", [
+    validateUsernameExists,
+    createUser
+], (req, res) =>{
     const {username, user_password} = req.body;
 
     bcrypt.hash(user_password, sRounds, (err, hash) =>{
@@ -50,7 +57,7 @@ router.post("/user/signup", [validateUsernameExists, createUser], (req, res) =>{
                 }
             }).then((response) =>{
                 res.status(201).json({msg: "User created succesfully"});
-            }).catch(e => res.status(400).json(e));
+            }).catch(e => res.status(500).json(e));
         } else{
             res.status(400).json({err});
         }

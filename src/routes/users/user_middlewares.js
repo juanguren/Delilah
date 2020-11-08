@@ -31,9 +31,9 @@ const validateUsernameExists = (req, res, next) => {
         if (response == "") {
             next();
         } else{
-            res.status(404).json({err: "User already exists"});            
+            res.status(403).json({err: "User already exists"});            
         }
-    }).catch(err => console.log(err))
+    }).catch(err => res.status(500).json(err));
 }
 
 const createUser = (req, res, next) => {
@@ -50,7 +50,7 @@ const createUser = (req, res, next) => {
             username,
             is_admin
         }
-    }).then((response) =>{
+    }).then(() =>{
         next();
     }).catch(err => res.json(err));
 }
