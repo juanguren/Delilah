@@ -52,13 +52,18 @@ const createUser = (req, res, next) => {
         }
     }).then(() =>{
         next();
-    }).catch(err => res.json(err));
+    }).catch(err => res.status(500).json(err));
 }
 
 const validateWithJWT = (req, res, next) =>{
     const {username} = req.body;
-    req.params.token = jwt.sign(username, signature);
-    next();
+    if (username) {
+        req.params.username = username;
+        req.params.token = jwt.sign(username, signature);
+        next();
+    } else{
+        return res.status(404).json({err: "Incorrect username."});
+    }
 }
 
 const validateHash = (req, res, next) =>{

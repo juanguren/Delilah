@@ -25,10 +25,10 @@ router.get("/users", [authUser, isAdmin], (req, res) =>{
         if (users) {
             res.status(200).json(users)
         } else{
-            res.status(200).json({msg: "No users registered yet"});
+            res.status(204).json({msg: "No users registered yet"});
         } 
     }).catch((err) =>{
-        console.log(err);
+        res.status(500).json(err);
     })
 });
 
@@ -65,10 +65,10 @@ router.post("/user", [
 });
 
 router.post("/user/auth", validateWithJWT, (req, res) =>{
-    const {username} = req.body;
-    const adminToken = req.params.token;
-    res.status(201).json({msg: `User *${username}* succesfully authenticated`,
-        adminToken});
+    const user = req.params.username;
+    const userToken = req.params.token;
+    res.status(201).json({msg: `User *${user}* succesfully authenticated`,
+        userToken});
 });
 
 router.post("/user/login", [authUser, validateHash], (req, res) =>{
