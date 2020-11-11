@@ -85,13 +85,13 @@ router.post("/user/login", [authUser, validateHash], (req, res) =>{
             }
         }).then(() =>{
             res.status(200).json({msg: `Success! User *${userIdentity}* is now logged in`});
-        }).catch(err => res.status(400).json(err));
+        }).catch(err => res.status(500).json(err));
     } else{
-        res.status(404).json({err: "username or password is incorrect. Please check them and try again."});
+        res.status(404).json({err: "Username or password is incorrect. Please check them and try again."});
     }
 });
 
-router.post("/user/:username/logout", (req, res) =>{
+router.put("/user/:username/logout", (req, res) =>{
     const {username} = req.params;
     sequelize.query('SELECT username FROM users WHERE username = :username',{
         type: Sequelize.QueryTypes.SELECT,
@@ -106,8 +106,8 @@ router.post("/user/:username/logout", (req, res) =>{
                     username
                 }
             }).then(() => res.status(200).json({msg: `User ${foundUser} has logged out`}));
-        } else {res.status(404).json({msg: `User ${username} does not exist. Please try again`})}
-    }).catch(errSelect => res.status(400).json(errSelect));
+        } else {res.status(404).json({err: `User ${username} does not exist. Please try again`})}
+    }).catch(errSelect => res.status(500).json(errSelect));
 });
 
 module.exports = router;
