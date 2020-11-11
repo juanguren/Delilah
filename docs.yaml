@@ -18,6 +18,8 @@ tags:
   description: Admin module
 - name: Items
   description: Items module
+- name: Users
+  description: Users module
 paths:
   /super:
     get:
@@ -518,8 +520,393 @@ paths:
       security:
       - bearerAuth:
         - JWT
+  /users:
+    get:
+      tags:
+      - Users
+      summary: Get user by id
+      description: |
+        Admin operation, needs an admin token.
+      operationId: getUser
+      responses:
+        "200":
+          description: User objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/retrieveUsers'
+        "204":
+          description: Empty
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    msg:
+                      type: string
+                      example: No users registered yet
+        "403":
+          description: no permissions
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: User is not admin
+        "404":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: The requested user does not exist.
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+      security:
+      - bearerAuth:
+        - JWT
+  /users/{id}:
+    get:
+      tags:
+      - Users
+      summary: Get user by id
+      description: |
+        Admin operation, needs an admin token.
+      operationId: getUserById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: User object
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/createUser'
+        "403":
+          description: Missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bearerTokenError'
+        "404":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: The requested user does not exist.
+      security:
+      - bearerAuth:
+        - JWT
+  /user:
+    post:
+      tags:
+      - Users
+      summary: Create user
+      description: |
+        Signs up new user
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createUser'
+      responses:
+        "201":
+          description: response object
+          content:
+            application/json:
+              schema:
+                properties:
+                  msg:
+                    type: string
+                    example: User created succesfully
+        "403":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: User already exists
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+  /user/auth:
+    post:
+      tags:
+      - Users
+      summary: Auth user
+      description: |
+        Authenticates new user
+      operationId: authUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                  example: heyMikee
+      responses:
+        "201":
+          description: response object
+          content:
+            application/json:
+              schema:
+                properties:
+                  msg:
+                    type: string
+                    example: User {username} succesfully authenticated, userToken
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Incorrect username.
+  /user/login:
+    post:
+      tags:
+      - Users
+      summary: Log user
+      description: |
+        Logs existing user
+      operationId: logUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                user_password:
+                  type: string
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                properties:
+                  msg:
+                    type: string
+                    example: Success! User {username} is now logged in
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Operation unsuccesful. Please check user credentials, error
+        "403":
+          description: Missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bearerTokenError'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Username or password is incorrect. Please check them and try again.
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+      security:
+      - bearerAuth:
+        - JWT
+  /user/{username}/logout:
+    put:
+      tags:
+      - Users
+      summary: Logs out user
+      description: |
+        Logs out existing user
+      operationId: logOutUsername
+      parameters:
+      - name: username
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                properties:
+                  msg:
+                    type: string
+                    example: User {username} has logged out
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Operation unsuccesful. Please check user credentials, error
+        "403":
+          description: Missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bearerTokenError'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: User ${username} does not exist. Please try again
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+  /order/create:
+    post:
+      tags:
+      - Orders
+      summary: Create an order
+      description: |
+        Generate and order as a logged user
+      operationId: createOrder
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                properties:
+                  msg:
+                    type: string
+                    example: User {username} has logged out
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Operation unsuccesful. Please check user credentials, error
+        "403":
+          description: Missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bearerTokenError'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: User ${username} does not exist. Please try again
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
 components:
   schemas:
+    retrieveUsers:
+      type: object
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        user_address:
+          type: string
+        user_password:
+          type: string
+        username:
+          type: string
+        is_admin:
+          type: boolean
+          default: false
+    createUser:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: Michael Jordan
+        email:
+          type: string
+          example: michaelJam@space.com
+        phone:
+          type: string
+          example: 23333
+        user_address:
+          type: string
+        user_password:
+          type: string
+        username:
+          type: string
+          example: heyMikee
+        is_admin:
+          type: boolean
+          default: false
     createItem:
       type: object
       properties:
@@ -634,12 +1021,6 @@ components:
         phone:
           type: string
           example: 408-867-5309
-    Schema:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
   securitySchemes:
     bearerAuth:
       type: http
