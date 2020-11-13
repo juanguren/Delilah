@@ -14,9 +14,9 @@ const isUserLoggedIn = (req, res, next) =>{
         if (response[0].username === username) {
             next();
         } else{
-            res.status(400).json({err: "Incorrect user credentials"});
+            res.status(500).json({err: "Incorrect user credentials"});
         }
-    }).catch(err => res.status(400).json(err))
+    }).catch(err => res.status(409).json({err: "Check user credentials"}))
 }
 
 const checkStock = (req, response, next) =>{ 
@@ -33,16 +33,16 @@ const checkStock = (req, response, next) =>{
                 let { quantity } = values;
                 let finalQuantity = quantity - ordered_quantity;
                 if (finalQuantity <= 0) {
-                    response.status(400).json({err: `Item is out of stock`});
+                    response.status(204).json({err: `Item is out of stock`});
                 } else {
                     sequelize.query('UPDATE items SET quantity = :finalQuantity WHERE item_id = :id', {
                         replacements: { finalQuantity, id }
                     }).then(() =>{
                         next();
-                    }).catch(e => response.status(400).json(e))
+                    }).catch(e => response.status(500).json(e))
                 }
             })
-        }).catch((error) => response.status(400).json({msg: "Error"}))
+        }).catch((error) => response.status(500).json({msg: "Error"}))
     })
 }
 
@@ -130,7 +130,7 @@ const orderbyID = (req, res, next) => {
     }).then((orders) =>{
         const { order_id } = orders[0];
         sequelize.query(
-        `SELECT items.name as Items, items.price, items.photo_url, o.*
+        `SELECT items.name as Item, items.price, items.photo_url, o.*
         FROM items
         INNER JOIN order_items ON items.item_id = order_items.item_id
         INNER JOIN orders o ON o.order_id = order_items.order_id
@@ -170,11 +170,9 @@ const cancelOrder = (req, res, next) =>{
 
 const updateOrderStatus = (req, res, next) =>{
     const order_status = req.params.status;
-    order_status.toUpperCase();
-
     const acceptedStatus = [
-        'PENDING',
-        'IN_PROGRESS'
+        'pending',
+        'in_progress'
     ]
     acceptedStatus.includes(order_status) ? next() : res.status(400).json({msg: 'Incorrect status entry. Please input a valid one', acceptedStatus});
 }
