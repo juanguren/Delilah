@@ -37,7 +37,6 @@ router.get("/order/:id", [
 ],
     (req, res) =>{
     let foundOrder = req.params.found;
-    console.log(foundOrder)
     res.status(200).json(foundOrder);
 });
 
@@ -70,7 +69,7 @@ router.put("/order/:id/:status", [
         replacements: { newStatus, order_id }
     }).then(() =>{
         res.status(200).json({msg: 'Order succesfully updated'})
-    }).catch((e) => res.status(400).json(e));
+    }).catch((e) => res.status(500).json(e));
 });
 
 router.put("order/:id/cancel", cancelOrder, (req, res) =>{
