@@ -20,6 +20,8 @@ tags:
   description: Items module
 - name: Users
   description: Users module
+- name: Orders
+  description: Orders module
 paths:
   /super:
     get:
@@ -823,6 +825,11 @@ paths:
       description: |
         Generate and order as a logged user
       operationId: createOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createOrder'
       responses:
         "200":
           description: response object
@@ -832,7 +839,19 @@ paths:
                 properties:
                   msg:
                     type: string
-                    example: User {username} has logged out
+                    example: Order succesfully created
+                  ID:
+                    type: string
+                    example: '{orderCode}'
+        "204":
+          description: Empty
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Item is out of stock
         "400":
           description: Bad Request
           content:
@@ -841,22 +860,266 @@ paths:
                 properties:
                   err:
                     type: string
-                    example: Operation unsuccesful. Please check user credentials, error
+                    example: Incorrect user credentials
         "403":
           description: Missing token
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/bearerTokenError'
-        "404":
-          description: Not found
+        "409":
+          description: Conflict
           content:
             application/json:
               schema:
                 properties:
                   err:
                     type: string
-                    example: User ${username} does not exist. Please try again
+                    example: Check user credentials
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+  /order/{id}/cancel:
+    put:
+      tags:
+      - Orders
+      summary: Cancel an order
+      description: |
+        Generate and order as a logged user
+      operationId: cancelOrder
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                properties:
+                  msg:
+                    type: string
+                    example: Order succesfully cancelled
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                properties:
+                  msg:
+                    type: string
+                    example: Couldn´t update order as cancelled
+                  error:
+                    type: string
+        "404":
+          description: Missing token
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: No reason was provided
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+  /order/{id}/{status}:
+    put:
+      tags:
+      - Orders
+      summary: Update an order
+      description: |
+        Update an order using two accepted status (ENUM): <br /> <br />
+            __[ PENDING || IN_PROGRESS || DELIVERED ]__ <br />
+      operationId: updateOrder
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: status
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                properties:
+                  msg:
+                    type: string
+                    example: Order succesfully updated
+                  ID:
+                    type: string
+                    example: '{orderCode}'
+        "204":
+          description: Empty
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Item is out of stock
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                properties:
+                  msg:
+                    type: string
+                    example: Couldn´t update order as cancelled
+                  error:
+                    type: string
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: User is not admin
+        "404":
+          description: Missing token
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Incorrect status entry. Please input a valid one
+                  acceptedStatus:
+                    type: array
+                    items:
+                      type: string
+                      example: PENDING, IN_PROGRESS, DELIVERED
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+  /orders:
+    get:
+      tags:
+      - Orders
+      summary: Get orders
+      description: |
+        Retrieve existing orders
+      operationId: getOrders
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/orderObject'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Incorrect user credentials
+        "403":
+          description: Missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bearerTokenError'
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+      security:
+      - bearerAuth:
+        - JWT
+  /order/{id}:
+    get:
+      tags:
+      - Orders
+      summary: Get order by Id
+      description: Get order by its specific UUID
+      operationId: getOrderById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: response object
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/orderById'
+        "204":
+          description: Empty
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Item is out of stock
+        "404":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Order not found.
+                  error:
+                    type: string
         "500":
           description: Server Error
           content:
@@ -867,6 +1130,82 @@ paths:
                     type: string
 components:
   schemas:
+    orderById:
+      properties:
+        items:
+          type: object
+          properties:
+            Item:
+              type: string
+              example: Kiwi Pizza
+            price:
+              type: string
+              example: 15
+            photo_url:
+              type: string
+              example: https://italicsmag.com/wp-content/uploads/2020/01/kiwi-4799161_1280.jpg
+            order_id:
+              type: number
+              example: 6500
+            order_time:
+              type: string
+              example: 14/11/2020
+            arrival_time:
+              type: string
+              example: 23/05/2021
+            order_status:
+              type: string
+              example: DELIVERED
+            canceled_order_id:
+              type: number
+            user_id:
+              type: number
+              example: 88
+            order_uuid:
+              type: string
+              example: ef2ade5c-cba0-44d6-9325-8d7135fc73c7
+    orderObject:
+      type: object
+      properties:
+        orders:
+          type: array
+          items:
+            type: object
+            properties:
+              order_id:
+                type: string
+              order_time:
+                type: string
+                example: Date
+              arrival_time:
+                type: string
+                example: Date
+              order_status:
+                type: string
+                example: PENDING
+              canceled_order_id:
+                type: number
+              user_id:
+                type: number
+                example: 59
+              order_uuid:
+                type: string
+                example: ef2ade5c-cba0-44d6-9325-8d7135fc73c7
+    createOrder:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            required:
+            - id
+            - quantity
+            type: object
+            properties:
+              quantity:
+                type: number
+              id:
+                type: number
     retrieveUsers:
       type: object
       properties:
