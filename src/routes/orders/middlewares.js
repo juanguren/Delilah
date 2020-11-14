@@ -42,11 +42,11 @@ const checkStock = (req, response, next) =>{
                     }).catch(e => response.status(500).json(e))
                 }
             })
-        }).catch((error) => response.status(500).json({msg: "Error"}))
+        }).catch((error) => response.status(400).json({msg: "Error. Incorrect item ID"}))
     })
 }
 
-const makeOrder = (req, res, next) =>{
+const makeOrder = (req, response, next) =>{
     const user = req.params.loggedUser;
     sequelize.query('SELECT user_id FROM users WHERE username = :user',{
         type: Sequelize.QueryTypes.SELECT,
@@ -68,7 +68,7 @@ const makeOrder = (req, res, next) =>{
                 }
             }).then(() =>{
                 req.params.orderId = order_uuid;
-                next();
+                sendOrderItems(req, response, next);
             })
         }
     }).catch(err => res.status(400).json(err));
@@ -77,17 +77,14 @@ const makeOrder = (req, res, next) =>{
 const sendOrderItems = (req, res, next) =>{
     const order = req.body;
     const order_uuid = req.params.orderId;
-
     sequelize.query('SELECT order_id FROM orders WHERE order_uuid = :order_id',{
         type: Sequelize.QueryTypes.SELECT,
         replacements: { order_id: order_uuid }
     }).then((response) =>{
         const {order_id} = response[0];
-
         order.items.map((all) =>{
             let item_id = all.id;
             let ordered_quantity = all.quantity;
-            console.log({item_id, ordered_quantity})
 
             sequelize.query('INSERT INTO order_items VALUES(NULL, :order_id, :item_id, :ordered_quantity)',{
                 replacements: {
@@ -96,11 +93,13 @@ const sendOrderItems = (req, res, next) =>{
                     ordered_quantity
                 }
             }).then((response) =>{
-                response ? next() : res.status(400).json({msg: "Error"})
+                response ? next() : res.status(400).json({msg: "Incomplete order"})
             }).catch(err => res.status(400).json({msg: "Error 1", err}))
         })
     }).catch(err => res.status({msg: "Error 2", err}))
 }
+
+const showResponse = (req, res) =>{}
 
 const isAdminLoggedIn = (req, res, next) =>{
     const username = req.params.loggedUser;
@@ -183,6 +182,7 @@ module.exports =
     checkStock,
     makeOrder,
     sendOrderItems,
+    showResponse,
     isAdminLoggedIn,
     orderbyID,
     cancelOrder,

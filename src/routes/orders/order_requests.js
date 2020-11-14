@@ -1,7 +1,6 @@
 
 const express = require("express");
 const body_parser = require("body-parser");
-const uuid = require("uuid");
 const router = express.Router();
 const { sequelize, Sequelize } = require("../../../server");
 const authUser = require("../../validations/authUser");
@@ -10,7 +9,7 @@ const {
     isUserLoggedIn,
     checkStock,
     makeOrder,
-    sendOrderItems,
+    showResponse,
     isAdminLoggedIn,
     orderbyID,
     cancelOrder,
@@ -47,7 +46,7 @@ router.post("/order/create", [
     isUserLoggedIn,
     checkStock,
     makeOrder,
-    sendOrderItems
+    showResponse
 ], 
 (req, res) =>{
     const orderCode = req.params.orderId;
