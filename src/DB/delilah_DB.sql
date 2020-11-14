@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 04-10-2020 a las 02:25:11
+-- Tiempo de generación: 15-11-2020 a las 00:34:56
 -- Versión del servidor: 10.4.13-MariaDB
 -- Versión de PHP: 7.4.7
 
@@ -33,17 +33,18 @@ CREATE TABLE `admin` (
   `admin_address` varchar(20) NOT NULL,
   `phone` varchar(15) NOT NULL,
   `super_id` int(11) DEFAULT NULL,
-  `isLogged` varchar(5) NOT NULL,
   `username` varchar(15) NOT NULL,
-  `password` varchar(15) NOT NULL
+  `password` varchar(15) NOT NULL,
+  `is_admin` varchar(5) NOT NULL,
+  `isLogged` varchar(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `admin`
 --
 
-INSERT INTO `admin` (`admin_id`, `fullName`, `admin_address`, `phone`, `super_id`, `isLogged`, `username`, `password`) VALUES
-(1, 'Juan Admin', 'calle juan 25 circun', '2265', NULL, 'true', 'juanguren', 'juanhey');
+INSERT INTO `admin` (`admin_id`, `fullName`, `admin_address`, `phone`, `super_id`, `username`, `password`, `is_admin`, `isLogged`) VALUES
+(8, 'Juan Admin', 'calle juan 25 circun', '2265', 5, 'juanguren', 'pass', 'true', 'true');
 
 -- --------------------------------------------------------
 
@@ -79,7 +80,8 @@ CREATE TABLE `items` (
 --
 
 INSERT INTO `items` (`item_id`, `name`, `photo_url`, `price`, `item_description`, `cooking_time`, `quantity`, `item_code`) VALUES
-(2, 'Hot Raviolli', '555d44d54', 23500, 'Tasty', '02:35:00', 5, '12');
+(2, 'Hot Raviolli', '555d44d54', 23500, 'Tasty', '02:35:00', 13, '12'),
+(3, 'Pineapple salad', '555d55d44d5', 15200, 'Healthy and magical salad.', '02:13:00', 74, '5');
 
 -- --------------------------------------------------------
 
@@ -152,13 +154,6 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Volcado de datos para la tabla `users`
---
-
-INSERT INTO `users` (`user_id`, `fullName`, `email`, `phone`, `user_address`, `user_password`, `username`, `is_admin`, `hash`, `isLogged`) VALUES
-(7, 'Juan Felipe Arangure', 'juan@hey.com', '31522', 'Calle 120', 'likeABaws', 'juanguren', '0', '$2b$10$zKCjBgsp6Ck5dz2.Fb9IrePvBj7K8dpQ/EJ7jV5Lx2G4VmkU/cYmC', 'true');
-
---
 -- Índices para tablas volcadas
 --
 
@@ -217,7 +212,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `canceled_order`
@@ -229,19 +224,19 @@ ALTER TABLE `canceled_order`
 -- AUTO_INCREMENT de la tabla `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=164;
 
 --
 -- AUTO_INCREMENT de la tabla `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=130;
 
 --
 -- AUTO_INCREMENT de la tabla `super_admin`
@@ -253,7 +248,7 @@ ALTER TABLE `super_admin`
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Restricciones para tablas volcadas
