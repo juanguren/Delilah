@@ -144,8 +144,8 @@ const orderbyID = (req, res, next) => {
             req.params.found = order;
             next();
         })
-        .catch(() => res.status(400).json({err: 'Order not found'}))
-    }).catch(() => res.status(400).json({err: 'Order not found'}));
+        .catch((err) => res.status(500).json({err}))
+    }).catch((err) => res.status(404).json({err: 'Order not found.'}));
 }
 
 const cancelOrder = (req, res, next) =>{
@@ -167,14 +167,15 @@ const cancelOrder = (req, res, next) =>{
             }).then(() => { next(); })
         }).catch((error) => res.status(400).json({msg: 'Couldn´t update order as cancelled', error}))
 
-    } else { res.status(404).json({msg: 'No reason provided'}) }
+    } else { res.status(404).json({msg: 'No reason was provided'}) }
 }
 
 const updateOrderStatus = (req, res, next) =>{
     const order_status = req.params.status;
     const acceptedStatus = [
-        'pending',
-        'in_progress'
+        'PENDING',
+        'IN_PROGRESS',
+        'DELIVERED'
     ]
     acceptedStatus.includes(order_status) ? next() : res.status(400).json({msg: 'Incorrect status entry. Please input a valid one', acceptedStatus});
 }
