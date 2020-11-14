@@ -69,6 +69,7 @@ const makeOrder = (req, response, next) =>{
             }).then(() =>{
                 req.params.orderId = order_uuid;
                 sendOrderItems(req, response, next);
+                next();
             })
         }
     }).catch(err => res.status(400).json(err));
@@ -93,13 +94,15 @@ const sendOrderItems = (req, res, next) =>{
                     ordered_quantity
                 }
             }).then((response) =>{
-                response ? next() : res.status(400).json({msg: "Incomplete order"})
+                if(response = ""){
+                    res.status(400).json({msg: "Incomplete order"})
+                }
             }).catch(err => res.status(400).json({msg: "Error 1", err}))
         })
     }).catch(err => res.status({msg: "Error 2", err}))
 }
 
-const showResponse = (req, res) =>{}
+const showResponse = (req, res) =>{} // Do not delete. This is keeping the order endpoint from failing and I still don't know why
 
 const isAdminLoggedIn = (req, res, next) =>{
     const username = req.params.loggedUser;
