@@ -10,3 +10,5 @@ Hello there, in order to correctly install and test this project, please follow 
   <li>Run the project locally using the command 'npm start'. It will start the server</li>
   <li>Test locally using an HTTP client such as <a href= "https://www.postman.com/">Postman</a></li>
 </ol>
+
+<h3><a href="https://app.swaggerhub.com/apis/juanguren/delilah-resto/0.5">Follow the instructions of its API</a></h3>
