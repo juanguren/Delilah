@@ -4,7 +4,7 @@
   "description": "RESTful API for a delivery system. Node.js - Express.js and MySQL",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon"
   },
   "author": "Juan Felipe Aranguren",
   "license": "ISC",
