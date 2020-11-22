@@ -8,7 +8,7 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: '0.5'
+  version: 1.0.0-oas3
 servers:
 - url: http://localhost:5000/delilah
 tags:
@@ -654,6 +654,24 @@ paths:
                   err:
                     type: string
                     example: User already exists
+        "404":
+          description: Empty
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Empty payload. Check your fields!
+        "422":
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: string
+                    example: Missing field
         "500":
           description: Server Error
           content:
@@ -884,67 +902,6 @@ paths:
                 properties:
                   err:
                     type: string
-  /order/{id}/cancel:
-    put:
-      tags:
-      - Orders
-      summary: Cancel an order
-      description: |
-        Generate and order as a logged user
-      operationId: cancelOrder
-      parameters:
-      - name: id
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                reason:
-                  type: string
-      responses:
-        "200":
-          description: response object
-          content:
-            application/json:
-              schema:
-                properties:
-                  msg:
-                    type: string
-                    example: Order succesfully cancelled
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                properties:
-                  msg:
-                    type: string
-                    example: Couldn´t update order as cancelled
-                  error:
-                    type: string
-        "404":
-          description: Missing token
-          content:
-            application/json:
-              schema:
-                properties:
-                  err:
-                    type: string
-                    example: No reason was provided
-        "500":
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                properties:
-                  err:
-                    type: string
   /order/{id}/{status}:
     put:
       tags:
@@ -952,7 +909,7 @@ paths:
       summary: Update an order
       description: |
         Update an order using two accepted status (ENUM): <br /> <br />
-            __[ PENDING || IN_PROGRESS || DELIVERED ]__ <br />
+            __[ PENDING || IN_PROGRESS || DELIVERED || CANCEL ]__ <br />
       operationId: updateOrder
       parameters:
       - name: id
@@ -978,7 +935,7 @@ paths:
                 properties:
                   msg:
                     type: string
-                    example: Order succesfully updated
+                    example: Order succesfully updated/cancelled
                   ID:
                     type: string
                     example: '{orderCode}'
