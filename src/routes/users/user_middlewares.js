@@ -38,7 +38,8 @@ const validateUsernameExists = (req, res, next) => {
 
 const createUser = (req, res, next) => {
     const { fullName, email, phone, user_address, user_password, username, is_admin } = req.body;
-    sequelize.query(`
+    if (req.body) {
+        sequelize.query(`
     INSERT INTO users VALUES
     (NULL, :fullName, :email, :phone, :user_address, :user_password, :username, :is_admin, NULL, NULL)`, {
         replacements: {
@@ -52,7 +53,10 @@ const createUser = (req, res, next) => {
         }
     }).then(() =>{
         next();
-    }).catch(err => res.status(500).json(err));
+    }).catch(err => res.status(422).json({err: "Missing field"}));
+    } else{
+        res.status(404).json({err: "Empty payload. Check your fields!"});
+    }
 }
 
 const validateWithJWT = (req, res, next) =>{
