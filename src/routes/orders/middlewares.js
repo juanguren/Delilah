@@ -175,7 +175,8 @@ const updateOrderStatus = (req, res, next) =>{
     const acceptedStatus = [
         'PENDING',
         'IN_PROGRESS',
-        'DELIVERED'
+        'DELIVERED',
+        'CANCEL'
     ]
     acceptedStatus.includes(order_status) ? next() : res.status(400).json({msg: 'Incorrect status entry. Please input a valid one', acceptedStatus});
 }

@@ -59,28 +59,23 @@ router.post("/order/create", [
 
 router.put("/order/:id/:status", [
     updateOrderStatus,
+    authUser,
     isAdmin
 ], (req, res) =>{
     const order_id = req.params.id;
-    const newStatus = req.params.status;
+    let newStatus = req.params.status;
     newStatus.toUpperCase();
-
+    if(newStatus === 'CANCEL'){
+        newStatus = "CANCELLED"
+    }
     sequelize.query('UPDATE orders SET order_status = :newStatus WHERE order_uuid = :order_id', {
         replacements: { newStatus, order_id }
     }).then(() =>{
-        res.status(200).json({msg: 'Order succesfully updated'})
+        if (newStatus === "CANCELLED") {
+            return res.status(200).json({msg: 'Order succesfully cancelled'});
+        } 
+        return res.status(200).json({msg: 'Order succesfully updated'});
     }).catch((e) => res.status(500).json(e));
-});
-
-router.put("order/:id/cancel", cancelOrder, (req, res) =>{
-    const order_id = req.params.id;
-    const newStatus = 'CANCELLED';
-
-    sequelize.query('UPDATE orders SET order_status = :newStatus WHERE order_uuid = :order_id', {
-        replacements: { newStatus, order_id }
-    }).then(() =>{
-        res.status(200).json({msg: 'Order succesfully cancelled'})
-    }).catch((e) => res.status(400).json(e));
 });
 
 module.exports = router;
