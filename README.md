@@ -12,3 +12,4 @@ Hello there, in order to correctly install and test this project, please follow 
 </ol>
 
 <h3><a href="https://app.swaggerhub.com/apis/juanguren/delilah-resto/1.0.0-oas3">Follow the instructions of its API</a></h3>
+<img src= "delilah_api.png"></img>
